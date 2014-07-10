@@ -1,6 +1,7 @@
 package RoutesConstructor;
 
 import TrafficNetGenerator.CoordinateTransfer;
+import TrafficNetGenerator.GMLFileReader;
 import TrafficNetGenerator.OSMapReader;
 
 import org.jgrapht.GraphPath;
@@ -9,65 +10,63 @@ import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by kwai on 6/11/14.
  */
 public class KSPTree {
 
-    WeightedGraph<String,DefaultWeightedEdge> u_graph;
-    OSMapReader reader;
-    KShortestPaths ksp;
-    List<GraphPath> pathList_1;
-    List<GraphPath> pathList_2;
+        WeightedGraph<String,DefaultWeightedEdge> u_graph;
+        OSMapReader reader;
+        KShortestPaths ksp;
+        List<GraphPath> pathList_1;
+        List<GraphPath> pathList_2;
 
-    public KSPTree(OSMapReader reader){
-        u_graph = new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
-        this.reader = reader;
-        pathList_1 = new LinkedList<GraphPath>();
-        pathList_2 = new LinkedList<GraphPath>();
-    }
+        public KSPTree(OSMapReader reader){
+            u_graph = new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+            this.reader = reader;
+            pathList_1 = new LinkedList<GraphPath>();
+            pathList_2 = new LinkedList<GraphPath>();
+        }
 
-    public WeightedGraph<String,DefaultWeightedEdge> constructGraph(){
+        public WeightedGraph<String,DefaultWeightedEdge> constructGraph(){
 
-        LinkedList<BasicLink> roadsList = reader.getMyBasicLinkSet();
+            LinkedList<BasicLink> roadsList = reader.getMyBasicLinkSet();
 
-        for(BasicLink links:roadsList){
-            //get end_vertices
-            ArrayList nodesArr = links.getNodeIDs();
-            String v0 = (String) nodesArr.get(nodesArr.size()-1);
-            String vn = (String) nodesArr.get(0);
+            for(BasicLink links:roadsList){
+                //get end_vertices
+                ArrayList nodesArr = links.getNodeIDs();
+                String v0 = (String) nodesArr.get(nodesArr.size()-1);
+                String vn = (String) nodesArr.get(0);
 
-            if(!v0.equals(vn)) { // remove loops
-                u_graph.addVertex(v0);
-                u_graph.addVertex(vn);
+                if(!v0.equals(vn)) { // remove loops
+                    u_graph.addVertex(v0);
+                    u_graph.addVertex(vn);
 
-                DefaultWeightedEdge edge = u_graph.addEdge(v0, vn);
+                    DefaultWeightedEdge edge = u_graph.addEdge(v0, vn);
 
-                //compute weight (actual distance) (unit: meters)
-                double a_lon, b_lon,a_lat,b_lat;
-                double weight = 0.0d;
-                for(int i = 0; i<links.getLats().size()-1;i++) {
-                    a_lon = (Double)(links.getLons()).get(i);
-                    b_lon = (Double)(links.getLons()).get(i+1);
-                    a_lat = (Double)(links.getLats()).get(i);
-                    b_lat = (Double)(links.getLats()).get(i+1);
-                    weight += Math.round(Math.sqrt(Math.pow((a_lon - b_lon) * 111000 * Math.sin((a_lat + b_lat) / 2), 2.0)
-                            + Math.pow((a_lat - b_lat) * 111000, 2.0)));
+                    //compute weight (actual distance) (unit: meters)
+                    double a_lon, b_lon,a_lat,b_lat;
+                    double weight = 0.0d;
+                    for(int i = 0; i<links.getLats().size()-1;i++) {
+                        a_lon = (Double)(links.getLons()).get(i);
+                        b_lon = (Double)(links.getLons()).get(i+1);
+                        a_lat = (Double)(links.getLats()).get(i);
+                        b_lat = (Double)(links.getLats()).get(i+1);
+                        weight += Math.round(Math.sqrt(Math.pow((a_lon - b_lon) * 111000 * Math.sin((a_lat + b_lat) / 2), 2.0)
+                                + Math.pow((a_lat - b_lat) * 111000, 2.0)));
+                    }
+
+                    if(edge != null) {
+                        u_graph.setEdgeWeight(edge, weight);
+                        System.out.println("["+v0+","+vn+"]  "+u_graph.getEdgeWeight(edge)+" meters");
+                    }
                 }
 
-               if(edge != null) {
-                   u_graph.setEdgeWeight(edge, weight);
-                   System.out.println("["+v0+","+vn+"]  "+u_graph.getEdgeWeight(edge)+" meters");
-               }
             }
-
+            return u_graph;
         }
-        return u_graph;
-    }
 
     public void runSingleSourceKSP(Object sourceVertex){
 
