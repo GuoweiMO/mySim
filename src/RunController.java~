@@ -1,0 +1,16 @@
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+
+/**
+ * Created by kwai on 4/28/14.
+ */
+public class RunController {
+
+    public static void main(String[] args){
+        Config myConfig = ConfigUtils.loadConfig("input/config.xml");
+        Controler controler = new Controler(myConfig);
+        controler.setOverwriteFiles(true);
+        controler.run();
+    }
+}
