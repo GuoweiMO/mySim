@@ -3,8 +3,8 @@
 //import gml.netgen.BasicEdge;
 //import gml.routing.KSPTree;
 //import gml.netgen.OSMapReader;
-//import gml.TripsAssignment.BasicAssignment;
-//import gml.TripsGenerator.CentroidsDesignator;
+//import gml.tripasg.BasicAssignment;
+//import gml.tripgen.CentroidsDesignator;
 //import org.jgrapht.WeightedGraph;
 //import org.jgrapht.graph.DefaultWeightedEdge;
 //

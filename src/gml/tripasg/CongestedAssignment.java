@@ -1,4 +1,4 @@
-package gml.TripsAssignment;
+package gml.tripasg;
 
 
 /**

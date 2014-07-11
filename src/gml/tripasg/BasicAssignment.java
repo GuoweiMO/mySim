@@ -1,6 +1,6 @@
-package gml.TripsAssignment;
+package gml.tripasg;
 
-import gml.DB_Interaction.JdbcUtils;
+import gml.db.JdbcUtils;
 
 import java.sql.SQLException;
 import java.util.*;

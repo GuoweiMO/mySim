@@ -1,6 +1,7 @@
 package gml.routing;
 
 import gml.netgen.BasicEdge;
+import gml.netgen.BasicNode;
 import gml.netgen.CoordinateTransfer;
 import gml.netgen.GMLFileReader;
 import org.jgrapht.GraphPath;
@@ -11,6 +12,7 @@ import org.jgrapht.graph.SimpleWeightedGraph;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
 * Created by kwai on 6/11/14.
@@ -37,9 +39,9 @@ public class KSPTree {
             for(BasicEdge links:roadsList){
 
                 //get end_vertices
-                List<String> nodesArr = links.getNodeIDs();
-                String v0 = nodesArr.get(0);
-                String vn = nodesArr.get(1);
+                List<String> nodesList = links.getNodeIDs();
+                String v0 = nodesList.get(0);
+                String vn = nodesList.get(1);
 
                 if(!v0.equals(vn)) { // remove loops
                     u_graph.addVertex(v0);
@@ -83,7 +85,7 @@ public class KSPTree {
 
                     System.out.println("From: " + sourceVertex + " To: " + vertex + "  Shortest Length:" + paths.get(0).getWeight());
                     System.out.println("Primary path:  " + paths.get(0));
-                    System.out.println("Secondary path:" + paths.get(1));
+                    //System.out.println("Secondary path:" + paths.get(1));
                     //System.out.println("");
 
                     pathList_1.add(paths.get(0));
@@ -104,41 +106,35 @@ public class KSPTree {
     }
 
     public double getVertexXCoord(String vertex){
-        List<BasicEdge> basicEdgeSet;
-        basicEdgeSet = reader.getBasicEdgeSet();
-        List<String> nodeIDs;
+        Set<BasicNode> basicNodeSet;
+        basicNodeSet = reader.getBasicNodeSet();
+
         CoordinateTransfer ct = new CoordinateTransfer(
                                         Double.parseDouble(reader.getMin_lat()),
                                         Double.parseDouble(reader.getMax_lat()),
                                         Double.parseDouble(reader.getMin_lon()),
                                         Double.parseDouble(reader.getMax_lon()));
         double xcoord = 0.0d;
-        for(BasicEdge links: basicEdgeSet){
-            nodeIDs = links.getNodeIDs();
-            for(int i = 0 ;i < nodeIDs.size(); i++){
-                if(nodeIDs.get(i).equals(vertex)){
-                    xcoord = ct.lonToScreenX(Double.parseDouble(links.getCoords().get(i).split(",")[0]));
-                }
+        for(BasicNode node: basicNodeSet){
+            if(node.getID().equals(vertex)){
+                    xcoord = ct.lonToScreenX(Double.parseDouble(node.getX()));
             }
         }
         return xcoord;
     }
 
     public double getVertexYCoord(String vertex){
-        List<BasicEdge> basicEdgeSet;
-        basicEdgeSet = reader.getBasicEdgeSet();
-        List<String> nodeIDs;
+        Set<BasicNode> basicNodeSet;
+        basicNodeSet = reader.getBasicNodeSet();
+
         CoordinateTransfer ct = new CoordinateTransfer(Double.parseDouble(reader.getMin_lat()),
                                         Double.parseDouble(reader.getMax_lat()),
                                         Double.parseDouble(reader.getMin_lon()),
                                         Double.parseDouble(reader.getMax_lon()));
         double ycoord = 0.0d;
-        for(BasicEdge links: basicEdgeSet){
-            nodeIDs = links.getNodeIDs();
-            for(int i = 0 ;i < nodeIDs.size(); i++){
-                if(nodeIDs.get(i).equals(vertex)){
-                    ycoord = ct.latToScreenY(Double.parseDouble(links.getCoords().get(i).split(",")[1]));
-                }
+        for(BasicNode node: basicNodeSet){
+            if(node.getID().equals(vertex)){
+                    ycoord = ct.latToScreenY(Double.parseDouble(node.getY()));
             }
         }
         return ycoord;

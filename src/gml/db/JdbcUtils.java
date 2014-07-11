@@ -1,4 +1,4 @@
-package gml.DB_Interaction;
+package gml.db;
 
 import java.sql.*;
 import java.util.ArrayList;

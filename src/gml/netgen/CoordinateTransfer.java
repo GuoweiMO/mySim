@@ -59,7 +59,7 @@ public class CoordinateTransfer {
 
     public double lonToScreenX(double lon){
 
-        return  ((lon - minlon)  * 3600) / getScaleX() + 100.0;
+        return  ((lon - minlon)  * 3600) / getScaleX();
 
     }
 
