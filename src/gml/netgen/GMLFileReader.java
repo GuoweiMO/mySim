@@ -56,7 +56,7 @@ public class GMLFileReader {
                 Node item = featureList.item(i);
                 if(item.getNodeType() == Node.ELEMENT_NODE){
                     Element ele = (Element) item;
-                    Node data = ele.getElementsByTagName("data").item(0);
+                    Node data = ele.getElementsByTagName("cen_milan").item(0);
                     //System.out.println(data.getNodeType());
                     if(data.getNodeType() == Node.ELEMENT_NODE){
                         Element data_ele = (Element) data;

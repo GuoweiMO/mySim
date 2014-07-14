@@ -12,7 +12,7 @@ import java.util.*;
 */
 public class CostMatrix {
     KSPTree tree;
-    HashSet<Object> CentroidSet;
+    //HashSet<Object> CentroidSet;
     CentroidsDesignator cd;
     HashSet<GraphPath> CentPathSet;
     List<Map<String,Object>> QueryResult;
@@ -22,24 +22,22 @@ public class CostMatrix {
         CentPathSet = new HashSet<GraphPath>();
     }
 
-    public HashSet<GraphPath> computeCostMatrix(){
+    public HashSet<GraphPath> computeCostMatrix(Set CentroidSet){
         double cur_time = System.currentTimeMillis();
-        // note undirected edges are printed as: {<v1>,<v2>}
-        CentroidSet = new HashSet<Object>(cd.getCentroidSet());
+
+        /*** note undirected edges are printed as: {<v1>,<v2>} ***/
+        //CentroidSet = new HashSet<Object>(cd.getCentroidSet());
 
         tree = cd.getTree();
 
-        //System.out.println(centroidList.size());
         for(Object vtx:CentroidSet) {
-            System.out.println("\n computing paths of source:" + vtx+ "  ...");
-            tree.runSingleSourceKSP(vtx);// get all possible path from one centroid to another
+            //System.out.println("\nComputing paths of source: " + vtx+ "  ...");
+            tree.runSingleSourceKSP(vtx,CentroidSet); // get all possible path from one centroid to another
             List<GraphPath> pathList = tree.getPathList_1();
                 for (GraphPath path : pathList) {
                     if (CentroidSet.contains(path.getStartVertex()) && CentroidSet.contains(path.getEndVertex())) {
-
-                        //pathList.remove(path);
                         CentPathSet.add(path);
-                        System.out.println(path.getEdgeList());
+                        //System.out.println(path.getEdgeList());
                     }
                 }
             }
@@ -93,7 +91,4 @@ public class CostMatrix {
         return cd;
     }
 
-    public HashSet<Object> getCentroidSet() {
-        return CentroidSet;
-    }
 }

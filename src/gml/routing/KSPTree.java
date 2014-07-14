@@ -71,18 +71,17 @@ public class KSPTree {
             return u_graph;
         }
 
-    public void runSingleSourceKSP(Object sourceVertex){
+    public void runSingleSourceKSP(Object sourceVertex,Set vertexSet){
 
-        System.out.println("\n Now the paths from " + sourceVertex + " are being computed as below:");
+        System.out.println("\nNow the paths from " + sourceVertex + " are being computed as below:");
 
         ksp = new KShortestPaths(u_graph,sourceVertex,2);
 
-        for(Object vertex:u_graph.vertexSet()){
+        for(Object vertex:vertexSet){
             if(!vertex.equals(sourceVertex)) { //exclude the path to self
                 List<GraphPath> paths = ksp.getPaths(vertex);
                 if (paths != null) {  // some node can not be reached
                     //print all reachable paths
-
                     System.out.println("From: " + sourceVertex + " To: " + vertex + "  Shortest Length:" + paths.get(0).getWeight());
                     System.out.println("Primary path:  " + paths.get(0));
                     //System.out.println("Secondary path:" + paths.get(1));

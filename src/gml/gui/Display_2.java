@@ -28,26 +28,18 @@ public class Display_2 extends JFrame {
 
 
         GMLFileReader reader = new GMLFileReader();
-        reader.read("Data/east_milan.gml");
+        reader.read("Data/cen_milan.gml");
 
 
         final KSPTree tree = new KSPTree(reader);
-        WeightedGraph<String,DefaultWeightedEdge> w_graph = tree.constructGraph();
+        //WeightedGraph<String,DefaultWeightedEdge> w_graph = tree.constructGraph();
 
-        CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,10,10);
-        cd.designateCentroids();
+        //CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,8,8);
+        //cd.designateCentroids();
 
-//        final List<Map<String,Object>> centroids = cd.queryCentroidsFromDB("Centroids");
+        final List<Map<String,Object>> centroids = CentroidsDesignator.queryCentroidsFromDB("milan_centroids");
 
-        final Set centSets = cd.getCentroidSet();
-
-//        for(Map map:centroids){
-//            centSets.add(map.get("centroid"));
-//        }
-
-
-//        BasicAssignment ba = new BasicAssignment();
-//        final List<Map<String,Object>> q_result = ba.queryfromDB("BasicAssignment");
+        //final Set centSets = cd.getCentroidSet();
 
         Display_2 d = new Display_2();
 
@@ -86,20 +78,14 @@ public class Display_2 extends JFrame {
                     }
 
                     //draw centroid points
-                    for(Object cent:centSets) {
-                        Ellipse2D.Double s_cir = new Ellipse2D.Double(tree.getVertexXCoord((String)cent)*this.getWidth()/1366 - 4,
-                                                        tree.getVertexYCoord((String) cent)*this.getHeight()/768 - 4, 8, 8);
+                    for(Map cent:centroids) {
+                        Ellipse2D.Double s_cir = new Ellipse2D.Double(tree.getVertexXCoord((String)cent.get("centroid"))*this.getWidth()/1366 - 4,
+                                                        tree.getVertexYCoord((String) cent.get("centroid"))*this.getHeight()/768 - 4, 8, 8);
 
                         g.setColor(Color.ORANGE);
                         ((Graphics2D) g).fill(s_cir);
-                        g.drawString((String) cent, ((Double) s_cir.getX()).intValue(),
+                        g.drawString((String) cent.get("centroid"), ((Double) s_cir.getX()).intValue()-6,
                                                     ((Double) s_cir.getY()).intValue());
-
-//                        if (centSets.contains(ePt)) {
-//                            g.setColor(Color.BLUE);
-//                            ((Graphics2D) g).fill(e_cir);
-//                            g.drawString(ePt, X0.intValue() - 5, Y0.intValue() - 5);
-//                        }
                     }
 
                 }

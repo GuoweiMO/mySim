@@ -142,7 +142,7 @@ public class CentroidsDesignator {
         }
     }
 
-    public List<Map<String,Object>> queryCentroidsFromDB(String tableName){
+    public static List<Map<String,Object>> queryCentroidsFromDB(String tableName){
         List<Map<String,Object>> result = new LinkedList<Map<String, Object>>();
         JdbcUtils jdbcUtils = new JdbcUtils();
         jdbcUtils.getConnection();
