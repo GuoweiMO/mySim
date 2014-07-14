@@ -5,6 +5,7 @@ import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -86,11 +87,20 @@ public class GMLFileReader {
                                 int s_flag = 1;
                                 int e_flag = 1;
                                 for (BasicNode node1 : BasicNodeSet) {
-                                    if ((node1.getX() + "," + node1.getY()).equals(s_node.getX() + "," + s_node.getY())) {
+                                    Double x_0 = Double.parseDouble(node1.getX());
+                                    Double y_0 = Double.parseDouble(node1.getY());
+                                    Double x_s = Double.parseDouble(s_node.getX());
+                                    Double y_s = Double.parseDouble(s_node.getY());
+                                    Double x_e = Double.parseDouble(e_node.getX());
+                                    Double y_e = Double.parseDouble(e_node.getY());
+
+                                    DecimalFormat df = new DecimalFormat("#.000000000000d");
+
+                                    if (df.format(x_0).equals(df.format(x_s)) && df.format(y_0).equals(df.format(y_s))) {
                                         s_flag = 0;
                                     }
 
-                                    if ((node1.getX() + "," + node1.getY()).equals(e_node.getX() + "," + e_node.getY())) {
+                                    if (df.format(x_0).equals(df.format(x_e)) && df.format(y_0).equals(df.format(y_e))) {
                                         e_flag = 0;
                                     }
                                 }
@@ -110,10 +120,19 @@ public class GMLFileReader {
 
                             List<String> endVerIDs = new ArrayList<String>();
                             for(BasicNode node2: BasicNodeSet) {
-                                if((node2.getX()+","+node2.getY()).equals(verTemp[0].trim())) {
+                                Double x_0 = Double.parseDouble(node2.getX());
+                                Double y_0 = Double.parseDouble(node2.getY());
+                                Double x_s = Double.parseDouble(s_node.getX());
+                                Double y_s = Double.parseDouble(s_node.getY());
+                                Double x_e = Double.parseDouble(e_node.getX());
+                                Double y_e = Double.parseDouble(e_node.getY());
+                                DecimalFormat df = new DecimalFormat("#.000000000000d");
+
+                                if (df.format(x_0).equals(df.format(x_s)) && df.format(y_0).equals(df.format(y_s))) {
                                     endVerIDs.add(node2.getID());
                                 }
-                                if((node2.getX()+","+node2.getY()).equals(verTemp[verTemp.length-1].trim())) {
+
+                                if(df.format(x_0).equals(df.format(x_e)) && df.format(y_0).equals(df.format(y_e))) {
                                     endVerIDs.add(node2.getID());
                                 }
                             }

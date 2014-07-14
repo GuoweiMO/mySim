@@ -10,12 +10,12 @@ import java.util.*;
  */
 public class BasicAssignment {
 
-    List<Map<String,Object>> QueryResult;
-    HashMap<String,Long> ODMatrix;
-    HashMap<String,Long> edgeTrips;
-    public BasicAssignment(List<Map<String,Object>> QueryResult,HashMap<String,Long> ODMatrix){
-        this.QueryResult = QueryResult;
-        this.ODMatrix = ODMatrix;
+    List<Map<String,Object>> db_pathinfo;
+    Map<String,Long> db_ODMatrix;
+    Map<String,Long> edgeTrips;
+    public BasicAssignment(List<Map<String,Object>> db_pathinfo,Map<String,Long> db_ODMatrix){
+        this.db_pathinfo = db_pathinfo;
+        this.db_ODMatrix = db_ODMatrix;
         edgeTrips = new HashMap<String, Long>();
     }
 
@@ -26,7 +26,7 @@ public class BasicAssignment {
     public void runAssignment(){
         List<String> edgeArr;
         String temStr;
-        for(Map<String,Object> g_path:QueryResult) {
+        for(Map<String,Object> g_path: db_pathinfo) {
             temStr = g_path.get("primary_path_edges").toString().trim();
             temStr = temStr.substring(1, temStr.length() - 1);
             //System.out.println(temStr);
@@ -42,10 +42,10 @@ public class BasicAssignment {
 
                 if(edgeTrips.keySet().contains(edge)){
                     edgeTrips.replace(edge,
-                            edgeTrips.get(edge)+ ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                            edgeTrips.get(edge) + db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
                 }
                 else {
-                    edgeTrips.put(edge, ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                    edgeTrips.put(edge, db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
                 }
             }
         }
@@ -57,7 +57,7 @@ public class BasicAssignment {
     }
 
 
-    public void save2DB(String tableName){
+    public void saveTrips2DB(String tableName){
         JdbcUtils jdbcUtils = new JdbcUtils();
         jdbcUtils.getConnection();
         for(Map.Entry entry:edgeTrips.entrySet()) {
@@ -75,7 +75,7 @@ public class BasicAssignment {
         }
     }
 
-    public List<Map<String,Object>> queryfromDB(String tableName){
+    public static List<Map<String,Object>> queryTripsfromDB(String tableName){
         List<Map<String,Object>> ResultList = new ArrayList<Map<String, Object>>();
 
         JdbcUtils jdbcUtils = new JdbcUtils();

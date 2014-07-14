@@ -1,8 +1,10 @@
 package gml.gui;
 
 import gml.netgen.BasicEdge;
+import gml.netgen.BasicNode;
 import gml.netgen.GMLFileReader;
 import gml.routing.KSPTree;
+import gml.tripasg.BasicAssignment;
 import gml.tripgen.CentroidsDesignator;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -11,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -27,17 +30,19 @@ public class Display_2 extends JFrame {
     public static void main(String[] args) {
 
 
-        GMLFileReader reader = new GMLFileReader();
+        final GMLFileReader reader = new GMLFileReader();
         reader.read("Data/cen_milan.gml");
 
 
         final KSPTree tree = new KSPTree(reader);
-        //WeightedGraph<String,DefaultWeightedEdge> w_graph = tree.constructGraph();
+        final WeightedGraph<String,DefaultWeightedEdge> w_graph = tree.constructGraph();
 
         //CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,8,8);
         //cd.designateCentroids();
 
         final List<Map<String,Object>> centroids = CentroidsDesignator.queryCentroidsFromDB("milan_centroids");
+
+        final List<Map<String,Object>> tripList = BasicAssignment.queryTripsfromDB("milan_BAtrips");
 
         //final Set centSets = cd.getCentroidSet();
 
@@ -73,7 +78,7 @@ public class Display_2 extends JFrame {
                             path.lineTo(((Double.parseDouble(coords.get(j).split(",")[0]) - minlon) * 3600) / (scaleX * 1366/this.getWidth()),
                                         ((maxlat - Double.parseDouble(coords.get(j).split(",")[1])) * 3600) / (scaleY * 768/this.getHeight()));
                         }
-                        g.setColor(Color.GREEN);
+                        g.setColor(Color.MAGENTA);
                         ((Graphics2D) g).draw(path);
                     }
 
@@ -88,10 +93,44 @@ public class Display_2 extends JFrame {
                                                     ((Double) s_cir.getY()).intValue());
                     }
 
+                    /******************Draw all vertexes in the graph*****************/
+//                    for(Object vtx:w_graph.vertexSet()){
+//                        Ellipse2D.Double s_cir = new Ellipse2D.Double(tree.getVertexXCoord((String)vtx)*this.getWidth()/1366 - 4,
+//                                tree.getVertexYCoord((String) vtx)*this.getHeight()/768 - 4, 8, 8);
+//
+//
+//                        g.setColor(Color.ORANGE);
+//                        ((Graphics2D) g).fill(s_cir);
+//                        g.setColor(Color.BLUE);
+//                        g.drawString((String) vtx, ((Double) s_cir.getX()).intValue()-6,
+//                                ((Double) s_cir.getY()).intValue());
+//                    }
+
+
+                    for(Map tripinfo:tripList) {
+                        Path2D trip_path = new Path2D.Double();
+                        Double t_x0 = tree.getVertexXCoord((String) tripinfo.get("start_vertex")) * this.getWidth() / 1366;
+                        Double t_y0 = tree.getVertexYCoord((String) tripinfo.get("start_vertex")) * this.getHeight() / 768;
+                        Double t_xn = tree.getVertexXCoord((String) tripinfo.get("end_vertex")) * this.getWidth() / 1366;
+                        Double t_yn = tree.getVertexYCoord((String) tripinfo.get("end_vertex")) * this.getHeight() / 768;
+
+                        Double trip =  ((Integer) tripinfo.get("trips"))/1000.0;
+
+
+                        trip_path.moveTo(t_x0, t_y0);
+                        trip_path.lineTo(t_xn, t_yn);
+
+                        g.setColor(Color.YELLOW);
+                        ((Graphics2D) g).draw(trip_path);
+                        g.setColor(Color.BLUE);
+                        g.drawString(new DecimalFormat("#.0").format(trip),(t_x0.intValue()+t_xn.intValue())/2,
+                                                (t_y0.intValue()+t_yn.intValue())/2);
+                    }
+
                 }
             });
 
-        d.setSize(1300, 680);
+        d.setSize(800, 680);
         d.setLocation(new Point(0, 0));
         d.setVisible(true);
         d.setResizable(true);

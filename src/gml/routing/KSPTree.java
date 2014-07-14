@@ -54,9 +54,9 @@ public class KSPTree {
                     double weight = 0.0d;
                     for(int i = 0; i<links.getCoords().size()-1;i++) {
                         a_lon = Double.parseDouble(links.getCoords().get(i).split(",")[0]);
-                        a_lat = Double.parseDouble(links.getCoords().get(i).split(",")[1]); ;
-                        b_lon = Double.parseDouble(links.getCoords().get(i+1).split(",")[0]); ;
-                        b_lat = Double.parseDouble(links.getCoords().get(i+1).split(",")[1]); ;
+                        a_lat = Double.parseDouble(links.getCoords().get(i).split(",")[1]);
+                        b_lon = Double.parseDouble(links.getCoords().get(i+1).split(",")[0]);
+                        b_lat = Double.parseDouble(links.getCoords().get(i+1).split(",")[1]);
                         weight += Math.round(Math.sqrt(Math.pow((a_lon - b_lon) * 111000 * Math.sin((a_lat + b_lat) / 2), 2.0)
                                 + Math.pow((a_lat - b_lat) * 111000, 2.0)));
                     }

@@ -15,7 +15,6 @@ public class CostMatrix {
     //HashSet<Object> CentroidSet;
     CentroidsDesignator cd;
     HashSet<GraphPath> CentPathSet;
-    List<Map<String,Object>> QueryResult;
 
     public CostMatrix(CentroidsDesignator cd){
         this.cd = cd;
@@ -67,7 +66,7 @@ public class CostMatrix {
     }
 
 
-    public List<Map<String,Object>> costMatrixfromDB(String tableName){
+    public static List<Map<String,Object>> costMatrixfromDB(String tableName){
         JdbcUtils jdbcUtils = new JdbcUtils();
         jdbcUtils.getConnection();
 
@@ -77,6 +76,7 @@ public class CostMatrix {
 //        paras.add("start_vertex");
 //        paras.add("end_vertex");
 //        paras.add("primary_path_length");
+        List<Map<String,Object>> QueryResult = new LinkedList<Map<String, Object>>();
 
             try {
                 QueryResult = jdbcUtils.findMultiResult(sql, paras);
@@ -85,6 +85,29 @@ public class CostMatrix {
                 e.printStackTrace();
             }
         return QueryResult;
+    }
+
+
+    //avgSpeed (meter/minute)
+    public static HashMap<String,Long> buildODMatrix(List<Map<String,Object>> query_result,double total_trips,double avgSpeed){
+        double total_cost = 0.0d;
+        HashMap<String,Long> ODtrips = new HashMap<String, Long>();
+        for(Map<String,Object> map:query_result){
+            total_cost += Math.exp((Double) map.get("primary_path_length") * (-0.1)/avgSpeed);
+        }
+
+        //Random rand = new Random();
+        //Math.abs(rand.nextGaussian()+1);
+        for(Map<String,Object> map2:query_result){
+            ODtrips.put(map2.get("start_vertex")+","+map2.get("end_vertex")
+                    ,Math.round(total_trips*Math.exp((-0.1)*(Double)map2.get("primary_path_length")/avgSpeed)/total_cost));
+        }
+
+//        for(Map.Entry entry:ODtrips.entrySet()){
+//            System.out.println(entry.toString());
+//        }
+
+        return ODtrips;
     }
 
     public CentroidsDesignator getCentroidDesignator() {

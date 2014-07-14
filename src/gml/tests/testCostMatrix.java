@@ -26,15 +26,15 @@ public class testCostMatrix {
         WeightedGraph w_graph = tree.constructGraph();
 
         CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,8,8); //62 points
-        //cd.designateCentroids();
+        cd.designateCentroids();
 
-        //cd.saveCentroids2DB("milan_centroids");
-        //List<Map<String,Object>> centroids = cd.queryCentroidsFromDB("milan_centroids");
+        cd.saveCentroids2DB("milan_centroids");
 
         List<Map<String,Object>> centroids = CentroidsDesignator.queryCentroidsFromDB("milan_centroids");
         Set centSet = new HashSet();
         for(Map cent:centroids){
             centSet.add(cent.get("centroid"));
+            System.out.println(cent.get("centroid"));
         }
         CostMatrix cm = new CostMatrix(cd);
         Set<GraphPath> pathSet = cm.computeCostMatrix(centSet);
