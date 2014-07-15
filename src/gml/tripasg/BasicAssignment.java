@@ -11,12 +11,12 @@ import java.util.*;
 public class BasicAssignment {
 
     List<Map<String,Object>> db_pathinfo;
-    Map<String,Long> db_ODMatrix;
-    Map<String,Long> edgeTrips;
-    public BasicAssignment(List<Map<String,Object>> db_pathinfo,Map<String,Long> db_ODMatrix){
+    Map<String,Double> db_ODMatrix;
+    Map<String,Double> edgeTrips;
+    public BasicAssignment(List<Map<String,Object>> db_pathinfo,Map<String,Double> db_ODMatrix){
         this.db_pathinfo = db_pathinfo;
         this.db_ODMatrix = db_ODMatrix;
-        edgeTrips = new HashMap<String, Long>();
+        edgeTrips = new HashMap<String, Double>();
     }
 
     public BasicAssignment(){
@@ -41,18 +41,22 @@ public class BasicAssignment {
                 edge = vtx1+","+vtx2;
 
                 if(edgeTrips.keySet().contains(edge)){
-                    edgeTrips.replace(edge,
-                            edgeTrips.get(edge) + db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                    if(db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")) !=null) {
+                        edgeTrips.replace(edge,
+                                edgeTrips.get(edge) + db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                    }
                 }
                 else {
-                    edgeTrips.put(edge, db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                    if(db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")) !=null) {
+                        edgeTrips.put(edge, db_ODMatrix.get(g_path.get("start_vertex") + "," + g_path.get("end_vertex")));
+                    }
                 }
             }
         }
 
-        for(Map.Entry entry:edgeTrips.entrySet()){
-            System.out.println(entry);
-        }
+//        for(Map.Entry entry:edgeTrips.entrySet()){
+//            System.out.println(entry);
+//        }
 
     }
 
@@ -93,5 +97,10 @@ public class BasicAssignment {
         }
 
         return ResultList;
+    }
+
+
+    public Map<String, Double> getEdgeTrips() {
+        return edgeTrips;
     }
 }

@@ -91,6 +91,7 @@ public class KSPTree {
 
                     if(paths.size()==2){
                     pathList_2.add(paths.get(1)); //store the second best path for each vertex pair
+                        System.out.println("Secondary path:  " + paths.get(1));
                     }
 
                 }
@@ -145,5 +146,9 @@ public class KSPTree {
 
     public List<GraphPath> getPathList_2() {
         return pathList_2;
+    }
+
+    public WeightedGraph<String, DefaultWeightedEdge> getGraph() {
+        return u_graph;
     }
 }

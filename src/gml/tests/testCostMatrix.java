@@ -26,9 +26,9 @@ public class testCostMatrix {
         WeightedGraph w_graph = tree.constructGraph();
 
         CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,8,8); //62 points
-        cd.designateCentroids();
+        //cd.designateCentroids();
 
-        cd.saveCentroids2DB("milan_centroids");
+        //cd.saveCentroids2DB("milan_centroids");
 
         List<Map<String,Object>> centroids = CentroidsDesignator.queryCentroidsFromDB("milan_centroids");
         Set centSet = new HashSet();
@@ -37,7 +37,9 @@ public class testCostMatrix {
             System.out.println(cent.get("centroid"));
         }
         CostMatrix cm = new CostMatrix(cd);
-        Set<GraphPath> pathSet = cm.computeCostMatrix(centSet);
+        cm.computeCostMatrix(centSet);
+        Set<GraphPath> p_pathSet = cm.getPrim_PathSet();
+        Set<GraphPath> s_pathSet = cm.getSecond_PathSet();
 //
 //        StringBuffer sb = new StringBuffer();
 //        for(GraphPath path:pathSet){
@@ -53,7 +55,7 @@ public class testCostMatrix {
 //            e.printStackTrace();
 //        }
 
-        cm.pathInfo2DB(pathSet,"milan_paths");
+        cm.pathInfo2DB(p_pathSet,s_pathSet,"milan_paths");
 
     }
 }
