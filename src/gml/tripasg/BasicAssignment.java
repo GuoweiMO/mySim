@@ -53,7 +53,7 @@ public class BasicAssignment {
                 }
             }
         }
-
+//
 //        for(Map.Entry entry:edgeTrips.entrySet()){
 //            System.out.println(entry);
 //        }

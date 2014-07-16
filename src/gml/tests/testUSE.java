@@ -3,6 +3,7 @@ package gml.tests;
 import gml.netgen.GMLFileReader;
 import gml.routing.KSPTree;
 import gml.tripasg.DynamicEquilibrium;
+import gml.tripasg.SDEAlgo;
 import org.jgrapht.WeightedGraph;
 
 /**
@@ -15,8 +16,10 @@ public class testUSE {
 
         KSPTree tree = new KSPTree(reader);
         tree.constructGraph();
+        SDEAlgo sdeAlgo = new SDEAlgo(tree);
+        sdeAlgo.reConstructGraph();
+        sdeAlgo.algoInit();
+        sdeAlgo.runAlgo();
 
-        DynamicEquilibrium de = new DynamicEquilibrium(tree,reader);
-        de.runSDEAlgo();
     }
 }

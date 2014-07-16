@@ -126,9 +126,9 @@ public class CostMatrix {
                     ,total_trips*Math.exp((-0.1)*(Double)map2.get("primary_path_length")/avgSpeed)/total_cost);
         }
 
-//        for(Map.Entry entry:ODtrips.entrySet()){
-//            System.out.println(entry.toString());
-//        }
+        for(Map.Entry entry:ODtrips.entrySet()){
+            System.out.println(entry.toString());
+        }
 
         return ODtrips;
     }
