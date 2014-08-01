@@ -22,6 +22,7 @@ public class AONAssignment {
     public void runAssignment(Map<String,Double> trips,Map<String,List<DefaultWeightedEdge>> pathlist){
 
         for(Map.Entry<String,List<DefaultWeightedEdge>> path:pathlist.entrySet()){ //each path
+            //System.out.println(path.getKey());
             for(DefaultWeightedEdge edge:path.getValue()){ //each edge in the path
                 if(!link_flow.containsKey(edge))
                     link_flow.put(edge,trips.get(path.getKey()));
@@ -30,6 +31,7 @@ public class AONAssignment {
             }
         }
     }
+
 
     public Map<DefaultWeightedEdge, Double> getLink_flow() {
         return link_flow;

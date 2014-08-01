@@ -3,32 +3,35 @@ package trs.analy;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.sim.AONAssignment;
-import trs.sim.Graphing;
 import trs.sim.Routing;
-import trs.sim.SDEAlgo;
 
 import java.util.*;
 
 /**
  * Created by kwai on 29/07/14.
  */
-public class Pricing {
+public class PricingModel {
 
     WeightedGraph<String,DefaultWeightedEdge> graph;
     WeightedGraph<String,DefaultWeightedEdge> graph_1;
+    Routing routing_1;
     Set<DefaultWeightedEdge> CgsEdges;
+    AONAssignment aona_1;
+    Map<String,List<DefaultWeightedEdge>> pathlist_1;
+    Map<String,Double> trips_1;
 
-    public Pricing(WeightedGraph<String, DefaultWeightedEdge> graph){
+    public PricingModel(WeightedGraph<String, DefaultWeightedEdge> graph,Routing routing){
         this.graph = graph;
         graph_1 = graph;
+        this.routing_1 = routing;
         CgsEdges = new HashSet<DefaultWeightedEdge>();
     }
 
-    public Map<DefaultWeightedEdge,Double> congestedPricing(
-                                Map<String, List<DefaultWeightedEdge>> pathlist_0,
-                                Map<String,Double> trips_0,
-                                Map<DefaultWeightedEdge, Double> flows_0,
-                                double cgsBound,boolean dynamic){
+    public Map<DefaultWeightedEdge,Double> staticChange(
+                                    Map<String, List<DefaultWeightedEdge>> pathlist_0,
+                                    Map<String, Double> trips_0,
+                                    Map<DefaultWeightedEdge, Double> flows_0,
+                                    double cgsBound, boolean dynamic){
         for(DefaultWeightedEdge edge:graph_1.edgeSet()){
             if(flows_0.get(edge)>=cgsBound){
                CgsEdges.add(edge);
@@ -41,14 +44,14 @@ public class Pricing {
 
         System.out.println("\nCongested Edges: "+ CgsEdges);
 
-        Routing routing_1 = new Routing(graph_1);
+        routing_1 = new Routing(graph_1);
         for(String vertex:graph_1.vertexSet()) {
             routing_1.runKSP(vertex);
         }
 
-        Map<String,List<DefaultWeightedEdge>> pathlist_1 = routing_1.getPathList();
+        pathlist_1 = routing_1.getPathList_1();
 
-        Map<String,Double> trips_1 = trips_0;
+        trips_1 = trips_0;
 
         //compute how many path passing the congested edges
         Map<DefaultWeightedEdge,Double> CgsCnt = new HashMap<DefaultWeightedEdge, Double>();
@@ -71,7 +74,7 @@ public class Pricing {
                     double percentage = trips_1.get(path_n.getKey())/ CgsCnt.get(edge_3);
                     //System.out.println("trips: "+trips_1.get(path_n.getKey()));
                     //System.out.println("decremental: "+ decremental*percentage);
-                    trips_1.replace(path_n.getKey(), trips_1.get(path_n.getKey())-decremental*percentage);
+                    trips_1.replace(path_n.getKey(), trips_1.get(path_n.getKey()) - decremental * percentage);
                 }
             }
         }
@@ -95,7 +98,6 @@ public class Pricing {
         }
 
 
-
         //increase trips that pass the edges adjacent to charged edges
         for(DefaultWeightedEdge edge_6: CgsEdges){
             String source = graph.getEdgeSource(edge_6);
@@ -109,7 +111,7 @@ public class Pricing {
                             double percentage = trips_1.get(path_1.getKey())/CgsCnt.get(edge_6);
                             //System.out.println("trips: "+trips_1.get(path_1.getKey()));
                             //System.out.println("incremental: "+ incremental*percentage);
-                            trips_1.replace(path_1.getKey(), trips_1.get(path_1.getKey())+incremental*percentage);
+                            trips_1.replace(path_1.getKey(), trips_1.get(path_1.getKey()) + incremental*percentage);
                         }
                     }
                 }
@@ -117,24 +119,101 @@ public class Pricing {
         }
 
 
-        AONAssignment aona_1 = new AONAssignment(graph_1,routing_1);
+        aona_1 = new AONAssignment(graph_1,routing_1);
         aona_1.runAssignment(trips_1,pathlist_1);
 
-        if(dynamic){
-            SDEAlgo sde_1 = new SDEAlgo(graph_1,routing_1,aona_1);
-            sde_1.algoInit();
-            sde_1.runAlgo();
-
-        }
+//        if(dynamic){
+//            SDEAlgo sde_1 = new SDEAlgo(graph_1,routing_1,aona_1);
+//            sde_1.algoInit();
+//            sde_1.runAlgo();
+//
+//        }
 
         return  aona_1.getLink_flow();
     }
 
-    public void cordonPricing(){
+    public Map<DefaultWeightedEdge,Double> selectiveChange(Map<String, List<DefaultWeightedEdge>> pathlist_a,
+                                Map<String, List<DefaultWeightedEdge>> pathlist_b,
+                                Map<String, Double> trips_a,
+                                Map<DefaultWeightedEdge, Double> flows_0,
+                                double cgsBound){
+        CgsEdges.clear();
+        for(DefaultWeightedEdge edge:graph_1.edgeSet()){
+            if(flows_0.get(edge)>=cgsBound){
+                CgsEdges.add(edge);
+            }
+        }
+        System.out.println("\nCongested Edges: "+ CgsEdges);
+
+        return selectiveAssign(trips_a,flows_0,pathlist_a,pathlist_b,cgsBound);
+    }
+
+    public Map<DefaultWeightedEdge,Double> selectiveAssign(Map<String,Double> trips,
+                                                           Map<DefaultWeightedEdge, Double> flows_0,
+                                                           Map<String,List<DefaultWeightedEdge>> pathlist_1,
+                                                           Map<String,List<DefaultWeightedEdge>> pathlist_2,
+                                                           double cgsBound){
+        Map<DefaultWeightedEdge,Double> link_flow = new HashMap<DefaultWeightedEdge, Double>();
+
+        for(Map.Entry<String,List<DefaultWeightedEdge>> path:pathlist_1.entrySet()){ //each path
+            //System.out.println(path.getKey());
+            double percentage = 1;
+            for(DefaultWeightedEdge edge:path.getValue()){ //each edge in the path
+                if(CgsEdges.contains(edge)) {
+                   percentage  = cgsBound/flows_0.get(edge);
+                }
+
+                if (!link_flow.containsKey(edge))
+                        link_flow.put(edge, percentage*trips.get(path.getKey()));
+                else
+                        link_flow.replace(edge, link_flow.get(edge) + percentage*trips.get(path.getKey()));
+            }
+        }
+
+        for(DefaultWeightedEdge edge:CgsEdges) {
+            for (Map.Entry<String, List<DefaultWeightedEdge>> path_1 : pathlist_1.entrySet()) { //each path
+                    if (path_1.getValue().contains(edge)) {
+                        List<DefaultWeightedEdge> alter_path = pathlist_2.get(path_1.getKey()); // get the alternate path
+                        for(DefaultWeightedEdge al_edge:alter_path) {
+
+                        link_flow.replace(al_edge,link_flow.get(al_edge)+trips.get(path_1.getKey())*(1-cgsBound/flows_0.get(edge)));
+
+                        }
+
+                    }
+
+                }
+            }
+
+        return  link_flow;
 
     }
 
     public WeightedGraph<String, DefaultWeightedEdge> getGraph_1() {
         return graph_1;
+    }
+
+    public AONAssignment getAona_1() {
+        return aona_1;
+    }
+
+    public Routing getRouting_1() {
+        return routing_1;
+    }
+
+    public Set<DefaultWeightedEdge> getCgsEdges() {
+        return CgsEdges;
+    }
+
+    public Map<String, List<DefaultWeightedEdge>> getPathlist_1() {
+        return pathlist_1;
+    }
+
+    public Map<String, Double> getTrips_1() {
+        return trips_1;
+    }
+
+    public void setGraph_1(WeightedGraph<String, DefaultWeightedEdge> graph_1) {
+        this.graph_1 = graph_1;
     }
 }

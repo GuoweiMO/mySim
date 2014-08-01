@@ -23,8 +23,8 @@ public class ODMatrix {
         grav = new HashMap<String, Double>();
         trips = new HashMap<String, Double>();
         costs = new HashMap<String, Double>();
-        for(Map.Entry<String,Double> pathinfo:routing.getPathinfo().entrySet()){
-            costs.put(pathinfo.getKey(),pathinfo.getValue()/500);
+        for(Map.Entry<String,Double> pathinfo:routing.getPathinfo_1().entrySet()){
+            costs.put(pathinfo.getKey(),pathinfo.getValue()/1000); // 60 km/h
         }
     }
 

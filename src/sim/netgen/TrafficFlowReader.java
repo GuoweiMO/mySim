@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 /**
  * Created by kwai on 27/07/14.
  */
