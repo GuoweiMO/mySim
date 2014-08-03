@@ -55,7 +55,7 @@ public class SDEAlgo {
     }
 
 
-    public void runAlgo(){
+    public void runAlgo(boolean pricing){
             float theta;
             boolean reached= false;
             for(int i = 1;;i++){ //start the iteration
@@ -69,11 +69,14 @@ public class SDEAlgo {
                     //System.out.print("current capacity: " + edge_Capacity.get(edge1) + "  ");
 
                     System.out.println( edge1+" ["+Old_Flow.get(edge1)+" --> "+ New_Flow.get(edge1)+"]");
-//                    if(New_Flow.get(edge1) > edge_Capacity.get(edge1)*0.8){
-//                        E_Cost.replace(edge1, Ini_Cost.get(edge1) * (1+0.35*Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0)));
-//                    }
-//                    else
-                    E_Cost.replace(edge1, Ini_Cost.get(edge1) * (1+0.15*Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0)));
+                    if(pricing) {
+                        if (New_Flow.get(edge1) > edge_Capacity.get(edge1) * 0.8) {
+                            E_Cost.replace(edge1, Ini_Cost.get(edge1) * (1 + 0.35 * Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0)));
+                        } else
+                            E_Cost.replace(edge1, Ini_Cost.get(edge1) * (1 + 0.15 * Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0)));
+                    }
+                    else
+                        E_Cost.replace(edge1, Ini_Cost.get(edge1) * (1 + 0.15 * Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0)));
 
                     total_flows +=New_Flow.get(edge1);
                     double actual_cost =  Ini_Cost.get(edge1) * (1+0.15*Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1), 4.0));

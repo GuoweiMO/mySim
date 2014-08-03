@@ -71,7 +71,7 @@ public class BasicRun {
             sde = new SDEAlgo(graph_0,graphing_0.getEdge_capacity(), routing_0, aona_0);
             sde.algoInit();
             sde.setDynpricing(true);
-            sde.runAlgo();
+            sde.runAlgo(false);
             SDE_Flows = sde.getNew_Flow();
 
 //            int flag = 36;
