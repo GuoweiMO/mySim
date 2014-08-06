@@ -4,7 +4,6 @@ import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.sim.AONAssignment;
 import trs.sim.Routing;
-
 import java.util.*;
 
 /**

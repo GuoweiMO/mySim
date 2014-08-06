@@ -3,7 +3,7 @@ package trs.sim;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-import sim.db.JdbcUtils;
+import sim_old.db.JdbcUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -11,11 +11,11 @@ import java.util.*;
 /**
  * Created by kwai on 28/07/14.
  */
-public class Graphing {
+public class GraphingB {
 
     WeightedGraph<String,DefaultWeightedEdge> w_graph;
     Map<DefaultWeightedEdge,Double> edge_capacity;
-    public Graphing(){
+    public GraphingB(){
         w_graph = new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
         edge_capacity = new HashMap<DefaultWeightedEdge, Double>();
     }

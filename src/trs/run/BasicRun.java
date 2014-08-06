@@ -1,8 +1,7 @@
-package trs;
+package trs.run;
 
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import trs.analy.PricingModel;
 import trs.sim.*;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public class BasicRun {
     Map<DefaultWeightedEdge,Double> flows_0;
     Map<String,List<DefaultWeightedEdge>> pathlist_0;
     Map<DefaultWeightedEdge,Double> SDE_Flows;
-    Graphing graphing_0;
+    GraphingB graphing_B_0;
     Routing routing_0;
     SDEAlgo sde;
 
@@ -27,8 +26,8 @@ public class BasicRun {
 
     public void run(boolean runSDE,boolean SDEPricing){
         //construct basic weighted undirected graph
-        graphing_0 = new Graphing();
-        WeightedGraph<String,DefaultWeightedEdge> graph_0 = graphing_0.buildGraph();
+        graphing_B_0 = new GraphingB();
+        WeightedGraph<String,DefaultWeightedEdge> graph_0 = graphing_B_0.buildGraph();
         System.out.println("-------------------------The Network-----------------------------------------------");
         for(DefaultWeightedEdge edge:graph_0.edgeSet()){
             System.out.println(edge+" ["+graph_0.getEdgeWeight(edge)+"]");
@@ -62,13 +61,13 @@ public class BasicRun {
             System.out.println(flow);
             pre_total += flow.getValue();
             pre_cost += flow.getValue()*graph_0.getEdgeWeight(flow.getKey())/500*
-                    (1+0.15*Math.pow(flow.getValue() / graphing_0.getEdge_capacity().get(flow.getKey()), 4.0));
+                    (1+0.15*Math.pow(flow.getValue() / graphing_B_0.getEdge_capacity().get(flow.getKey()), 4.0));
         }
         System.out.println("Total Flow: "+pre_total + "Total Cost: "+pre_cost);
 
         if(runSDE) {
             System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
-            sde = new SDEAlgo(graph_0,graphing_0.getEdge_capacity(), routing_0, aona_0);
+            sde = new SDEAlgo(graph_0, graphing_B_0.getEdge_capacity(), routing_0, aona_0);
             sde.algoInit();
             sde.setDynpricing(true);
             sde.runAlgo(false);

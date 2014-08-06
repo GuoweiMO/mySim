@@ -1,4 +1,4 @@
-package trs.sim.netgen;
+package sim_old.netgen;
 
 /**
  * Created by kwai on 26/06/14.

@@ -1,4 +1,4 @@
-package trs;
+package trs.util;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

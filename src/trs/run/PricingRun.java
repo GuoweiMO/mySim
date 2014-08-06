@@ -1,4 +1,4 @@
-package trs;
+package trs.run;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.analy.PricingModel;
@@ -16,7 +16,7 @@ public class PricingRun extends BasicRun {
     public void congestedRun(){
         run(false,false);
 
-        PricingModel stp = new PricingModel(super.graphing_0.getW_graph(),super.routing_0);
+        PricingModel stp = new PricingModel(super.graphing_B_0.getW_graph(),super.routing_0);
         Map<DefaultWeightedEdge,Double> flows_1 = stp.staticChange(super.pathlist_0, super.trips_0, super.flows_0, 2000, false);
 
         double post_flow = 0.0d;
@@ -25,7 +25,7 @@ public class PricingRun extends BasicRun {
             System.out.println(flow);
             post_flow += flow.getValue();
             post_cost += flow.getValue()*stp.getGraph_1().getEdgeWeight(flow.getKey())/500
-                         *(1+0.15*Math.pow(flow.getValue() / super.graphing_0.getEdge_capacity().get(flow.getKey()), 4.0));
+                         *(1+0.15*Math.pow(flow.getValue() / super.graphing_B_0.getEdge_capacity().get(flow.getKey()), 4.0));
         }
         System.out.println("Total Flow: " +post_flow+"  "+"Total Cost: "+post_cost); //stp.getCgsEdges().size()*22
 
@@ -33,7 +33,7 @@ public class PricingRun extends BasicRun {
 
     public void run(){
         run(false,false);
-        PricingModel slp = new PricingModel(super.graphing_0.getW_graph(),super.routing_0);
+        PricingModel slp = new PricingModel(super.graphing_B_0.getW_graph(),super.routing_0);
         Map<DefaultWeightedEdge,Double> flows_2 = slp.selectiveChange(super.routing_0.getPathList_1(),
                                 super.routing_0.getPathList_2(),super.trips_0,super.flows_0,2000);
 
@@ -47,7 +47,7 @@ public class PricingRun extends BasicRun {
             System.out.println(flow);
             post_flow += flow.getValue();
             post_cost += flow.getValue()*slp.getGraph_1().getEdgeWeight(flow.getKey())/500
-                    *(1+0.15*Math.pow(flow.getValue()/super.graphing_0.getEdge_capacity().get(flow.getKey()),4.0));
+                    *(1+0.15*Math.pow(flow.getValue()/super.graphing_B_0.getEdge_capacity().get(flow.getKey()),4.0));
         }
         System.out.println("Total Flow: " +post_flow+"  "+"Total Cost: "+post_cost);
 
@@ -56,7 +56,7 @@ public class PricingRun extends BasicRun {
 
     public void dynamicRun(){
         run(true,false);
-        PricingModel dyp = new PricingModel(super.graphing_0.getW_graph(),super.routing_0);
+        PricingModel dyp = new PricingModel(super.graphing_B_0.getW_graph(),super.routing_0);
         //trial 1
         Map<DefaultWeightedEdge,Double> flows_2
                 =dyp.staticChange(super.pathlist_0, super.sde.getFinal_Trips(), super.sde.getNew_Flow(), 1000, true); //561
@@ -67,7 +67,7 @@ public class PricingRun extends BasicRun {
             System.out.println(flow);
             post_flow += flow.getValue();
             post_cost += flow.getValue()*dyp.getGraph_1().getEdgeWeight(flow.getKey())/500
-                        *(1+0.15*Math.pow(flow.getValue()/super.graphing_0.getEdge_capacity().get(flow.getKey()),4.0));
+                        *(1+0.15*Math.pow(flow.getValue()/super.graphing_B_0.getEdge_capacity().get(flow.getKey()),4.0));
         }
         System.out.println("Total Flow: " +post_flow+"  "+"Total Cost: "+post_cost);
 
