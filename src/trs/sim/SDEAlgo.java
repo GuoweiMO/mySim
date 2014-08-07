@@ -100,14 +100,14 @@ public class SDEAlgo {
 
                 RG = (cur_sum-std_sum)/cur_sum;
                 System.out.println("RelGap: "+ RG);
-                if( i>1 && Math.abs(RG) <0.001){
+                if( i>1 && Math.abs(RG) <0.0001){
                     System.out.println("Social Equilibrium Reaches. (iteration "+i +" )");
                     break;
                 }
 
                 int flag = 0;
                 for(DefaultWeightedEdge edge_n:graph.edgeSet()){
-                    if(Math.abs(New_Flow.get(edge_n) - Old_Flow.get(edge_n)) > 1){
+                    if(Math.abs(New_Flow.get(edge_n) - Old_Flow.get(edge_n)) > 0.1){
                         flag++;
                     }
                 }
