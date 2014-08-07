@@ -16,6 +16,9 @@ public class AoNAssignment {
     public AoNAssignment(WeightedGraph<String, DefaultWeightedEdge> graph){
         this.graph=graph;
         link_flow = new HashMap<DefaultWeightedEdge, Double>();
+        for(DefaultWeightedEdge edge:graph.edgeSet()){
+            link_flow.put(edge,0.0); // initialise the flow of the network (possibly no flow on some links )
+        }
     }
     public void runAssignment(Map<String,Double> trips,Map<String,List<DefaultWeightedEdge>> pathlist){
 
@@ -23,7 +26,7 @@ public class AoNAssignment {
             //System.out.println(path.getKey());
             for(DefaultWeightedEdge edge:path.getValue()){ //each edge in the path
                 if(!link_flow.containsKey(edge))
-                    link_flow.put(edge,trips.get(path.getKey()));
+                    link_flow.replace(edge,trips.get(path.getKey()));
                 else
                     link_flow.replace(edge,link_flow.get(edge)+trips.get(path.getKey()));
             }

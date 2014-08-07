@@ -66,6 +66,7 @@ public class SDEAlgo {
                 double total_flows=0.0d;
                 double total_cost = 0.0d;
                 for(DefaultWeightedEdge edge1:graph.edgeSet()){
+
                     New_Flow.replace(edge1,(1.0-theta)*Old_Flow.get(edge1)+theta*Aux_Flow.get(edge1));
 
                     //System.out.print("current capacity: " + edge_Capacity.get(edge1) + "  ");
@@ -115,7 +116,7 @@ public class SDEAlgo {
                     break;
                 }
 
-                Map<DefaultWeightedEdge,Double> updated_trips = this.reRunAON(10000,pathList_1,pathInfo_1);
+                Map<DefaultWeightedEdge,Double> updated_trips = this.reRunAON(25000,pathList_1,pathInfo_1);
                 this.update_AuxFlow(updated_trips);
 
                 for(DefaultWeightedEdge edge2:graph.edgeSet()){

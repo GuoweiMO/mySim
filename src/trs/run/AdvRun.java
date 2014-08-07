@@ -62,16 +62,18 @@ public class AdvRun {
 //        }
 //        pathlist_1 = routing_0.getPathList_1();
 
-        /********************Query from MySQL and Put into PathList***********************/
+        /********************Query from MySQL and Put into PathList/PathInfo/Centroids********************/
         JdbcUtils jdbcUtils = new JdbcUtils();
         jdbcUtils.getConnection();
 
         String sql = "select start_vertex,end_vertex,primary_path_length,primary_path_edges from milan_paths";
-
+        String sql_2 = "select centroid from milan_centroids";
         List<Object> paras = new ArrayList<Object>();
         List<Map<String,Object>> QueryResult = new LinkedList<Map<String, Object>>();
+        List<Map<String,Object>> CentroidList = new LinkedList<Map<String, Object>>();
         try {
             QueryResult = jdbcUtils.findMultiResult(sql, paras);
+            CentroidList = jdbcUtils.findMultiResult(sql_2, paras);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -133,14 +135,21 @@ public class AdvRun {
 //        sb.append("-------------------------All-or-Nothing Assignment----------------------------------\n");
         double pre_total=0.0d;
         double pre_cost =0.0d;
+        Set<DefaultWeightedEdge> zeroEdges = new HashSet<DefaultWeightedEdge>();
         for(Map.Entry<DefaultWeightedEdge,Double> flow:flows.entrySet()) {
             System.out.println(flow);
+            if(flow.getValue() == 0.0){
+                zeroEdges.add(flow.getKey());
+            }
 //            sb.append(flow+"\n");
             pre_total += flow.getValue();
             pre_cost += flow.getValue()*graph_0.getEdgeWeight(flow.getKey())/500.0*
                     (1+0.15*Math.pow(flow.getValue() / graphingA.getCapacity().get(flow.getKey()), 4.0));
         }
         System.out.println("Total Flow: "+pre_total + "  Total Cost: "+pre_cost);
+
+        graph_0.removeAllEdges(zeroEdges); // remove the links that are 0 flows after assignment;
+
 //        sb.append("Total Flow: "+pre_total + "  Total Cost: "+pre_cost);
 //        try {
 //            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/AoNA_Flows")));
@@ -158,15 +167,15 @@ public class AdvRun {
         sde.runAlgo(false); //false for not running the part of pricing;
         SDE_Flows = sde.getNew_Flow();
 
-        double post_flow = 0.0d;
-        double post_cost = 0.0d;
-        for(Map.Entry<DefaultWeightedEdge,Double> flow:SDE_Flows.entrySet()) {
-            System.out.println(flow);
-            post_flow += flow.getValue();
-            post_cost += flow.getValue()*graph_0.getEdgeWeight(flow.getKey())/500
-                    *(1+0.15*Math.pow(flow.getValue()/graphingA.getCapacity().get(flow.getKey()),4.0));
-        }
-        System.out.println("Total Flow: " +post_flow+"  "+"Total Cost: "+post_cost);
+//        double post_flow = 0.0d;
+//        double post_cost = 0.0d;
+//        for(Map.Entry<DefaultWeightedEdge,Double> flow:SDE_Flows.entrySet()) {
+//
+//            post_flow += flow.getValue();
+//            post_cost += flow.getValue()*graph_0.getEdgeWeight(flow.getKey())/500.0*
+//                     (1+0.15*Math.pow(flow.getValue()/graphingA.getCapacity().get(flow.getKey()),4.0));
+//        }
+//        System.out.println("Total Flow: " +post_flow+"  "+"Total Cost: "+post_cost);
 
     }
 
