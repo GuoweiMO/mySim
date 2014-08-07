@@ -19,17 +19,19 @@ public class SDEAlgo {
     Map<DefaultWeightedEdge,Double> E_Cost;
     Map<DefaultWeightedEdge,Double> Ini_Cost;
     Map<String,Double> final_Trips;
-    AONAssignment aona;
-    Routing routing;
+    AoNAssignment aona;
+    Map<String,List<DefaultWeightedEdge>> pathList_1;
+    Map<String,Double> pathInfo_1;
     Map<DefaultWeightedEdge,Double> edge_Capacity;
-    boolean dynpricing = false;
 
     public SDEAlgo(WeightedGraph<String,DefaultWeightedEdge> graph,
                    Map<DefaultWeightedEdge,Double> edge_Capacity,
-                   Routing routing,AONAssignment aona){
+                   Map<String,List<DefaultWeightedEdge>> pathList_1,
+                   Map<String,Double> pathInfo_1,AoNAssignment aona){
 
         this.graph = graph;
-        this.routing = routing;
+        this.pathList_1 = pathList_1;
+        this.pathInfo_1 = pathInfo_1;
         this.aona = aona;
         this.edge_Capacity = edge_Capacity;
 
@@ -113,7 +115,7 @@ public class SDEAlgo {
                     break;
                 }
 
-                Map<DefaultWeightedEdge,Double> updated_trips = this.reRunAON(10000,routing);
+                Map<DefaultWeightedEdge,Double> updated_trips = this.reRunAON(10000,pathList_1,pathInfo_1);
                 this.update_AuxFlow(updated_trips);
 
                 for(DefaultWeightedEdge edge2:graph.edgeSet()){
@@ -122,19 +124,21 @@ public class SDEAlgo {
          }
     }
 
-    public Map<DefaultWeightedEdge, Double> reRunAON(double total_trips,Routing routing){
-            ODMatrix od2 = new ODMatrix(graph,routing);
+    public Map<DefaultWeightedEdge, Double> reRunAON(double total_trips,Map<String,List<DefaultWeightedEdge>> pathList_1,
+            Map<String,Double> pathInfo_1){
+
+            ODMatrix od2 = new ODMatrix(graph,pathInfo_1);
             Map<String,Double> New_Cost = new HashMap<String, Double>();
 
             //initialise the new_cost
-            for(Map.Entry<String,List<DefaultWeightedEdge>> pathlist_0:routing.getPathList_1().entrySet()){
-                New_Cost.put(pathlist_0.getKey(),0.0);
+            for(Map.Entry<String,List<DefaultWeightedEdge>> path_a:pathList_1.entrySet()){
+                New_Cost.put(path_a.getKey(),0.0);
             }
 
             for(DefaultWeightedEdge edge:graph.edgeSet()) {
-                for(Map.Entry<String,List<DefaultWeightedEdge>> pathlist:routing.getPathList_1().entrySet()){
-                    if(pathlist.getValue().contains(edge)){
-                        New_Cost.replace(pathlist.getKey(),New_Cost.get(pathlist.getKey())+E_Cost.get(edge));
+                for(Map.Entry<String,List<DefaultWeightedEdge>> path_b:pathList_1.entrySet()){
+                    if(path_b.getValue().contains(edge)){
+                        New_Cost.replace(path_b.getKey(),New_Cost.get(path_b.getKey())+E_Cost.get(edge));
                     }
 
                 }
@@ -143,8 +147,8 @@ public class SDEAlgo {
             od2.setCosts(New_Cost);
             od2.generateCost(total_trips);
             final_Trips = od2.getTrips();
-            AONAssignment aona2 = new AONAssignment(graph,routing);
-            aona2.runAssignment(od2.getTrips(),routing.getPathList_1());
+            AoNAssignment aona2 = new AoNAssignment(graph);
+            aona2.runAssignment(od2.getTrips(), pathList_1);
             return aona2.getLink_flow();
     }
 
@@ -160,10 +164,6 @@ public class SDEAlgo {
 
     public Map<String, Double> getFinal_Trips() {
         return final_Trips;
-    }
-
-    public void setDynpricing(boolean dynpricing) {
-        this.dynpricing = dynpricing;
     }
 
     public void setNew_Flow(Map<DefaultWeightedEdge, Double> new_Flow) {

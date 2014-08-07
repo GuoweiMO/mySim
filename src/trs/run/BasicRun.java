@@ -42,17 +42,17 @@ public class BasicRun {
 
         //construct O-D matrix
         System.out.println("-------------------------The Trips Between 2 Vertexes------------------------------");
-        ODMatrix od_0 = new ODMatrix(graph_0,routing_0);
+        ODMatrix od_0 = new ODMatrix(graph_0,routing_0.getPathinfo_1());
         od_0.generateCost(TOTAL_TRIPS);
         trips_0 = od_0.getTrips();
-//        for(Map.Entry trip:trips_0.entrySet()) {
+//        for(Map.Entry trip:trips.entrySet()) {
 //            System.out.println(trip);
 //        }
 
 
         //run All-or-Nothing Assignment
         System.out.println("-------------------------All-or-Nothing Assignment----------------------------------");
-        AONAssignment aona_0 = new AONAssignment(graph_0,routing_0);
+        AoNAssignment aona_0 = new AoNAssignment(graph_0);
         aona_0.runAssignment(trips_0,pathlist_0);
         flows_0 = aona_0.getLink_flow();
         double pre_total=0.0d;
@@ -67,9 +67,8 @@ public class BasicRun {
 
         if(runSDE) {
             System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
-            sde = new SDEAlgo(graph_0, graphing_B_0.getEdge_capacity(), routing_0, aona_0);
+            sde = new SDEAlgo(graph_0, graphing_B_0.getEdge_capacity(), pathlist_0,routing_0.getPathinfo_1(), aona_0);
             sde.algoInit();
-            sde.setDynpricing(true);
             sde.runAlgo(false);
             SDE_Flows = sde.getNew_Flow();
 

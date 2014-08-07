@@ -10,13 +10,11 @@ import java.util.Map;
 /**
  * Created by kwai on 28/07/14.
  */
-public class AONAssignment {
+public class AoNAssignment {
     WeightedGraph<String,DefaultWeightedEdge> graph;
-    Routing route;
     Map<DefaultWeightedEdge,Double> link_flow;
-    public AONAssignment(WeightedGraph<String,DefaultWeightedEdge> graph,Routing route){
+    public AoNAssignment(WeightedGraph<String, DefaultWeightedEdge> graph){
         this.graph=graph;
-        this.route = route;
         link_flow = new HashMap<DefaultWeightedEdge, Double>();
     }
     public void runAssignment(Map<String,Double> trips,Map<String,List<DefaultWeightedEdge>> pathlist){

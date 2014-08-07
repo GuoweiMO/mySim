@@ -31,10 +31,10 @@ public class Routing {
 
     public void runKSP(String source){
         ksp = new KShortestPaths(graph,source,2);
-
+        System.out.print("Computing source: "+source +"...   ");
+        double cur_time = System.currentTimeMillis();
         for(String vertex:graph.vertexSet()) {
             if (!vertex.equals(source)) {
-                //System.out.println("current source:"+source);
                 List<GraphPath> path = ksp.getPaths(vertex);
                 pathinfo_1.put(path.get(0).getStartVertex() + "," + path.get(0).getEndVertex(), path.get(0).getWeight());
                 pathList_1.put(path.get(0).getStartVertex() + "," + path.get(0).getEndVertex(), path.get(0).getEdgeList());
@@ -42,9 +42,10 @@ public class Routing {
                 pathinfo_2.put(path.get(1).getStartVertex() + "," + path.get(1).getEndVertex(), path.get(1).getWeight());
                 pathList_2.put(path.get(1).getStartVertex() + "," + path.get(1).getEndVertex(), path.get(1).getEdgeList());
 
-                //System.out.println(pathList_1.get(path.get(0).getStartVertex() + "," + path.get(0).getEndVertex()));
             }
         }
+
+        System.out.println("Finish. Time: "+(System.currentTimeMillis()-cur_time)/1000 +"s");
 
     }
 

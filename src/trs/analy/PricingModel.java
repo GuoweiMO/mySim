@@ -2,7 +2,7 @@ package trs.analy;
 
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import trs.sim.AONAssignment;
+import trs.sim.AoNAssignment;
 import trs.sim.Routing;
 import java.util.*;
 
@@ -15,7 +15,7 @@ public class PricingModel {
     WeightedGraph<String,DefaultWeightedEdge> graph_1;
     Routing routing_1;
     Set<DefaultWeightedEdge> CgsEdges;
-    AONAssignment aona_1;
+    AoNAssignment aona_1;
     Map<String,List<DefaultWeightedEdge>> pathlist_1;
     Map<String,Double> trips_1;
 
@@ -118,7 +118,7 @@ public class PricingModel {
         }
 
 
-        aona_1 = new AONAssignment(graph_1,routing_1);
+        aona_1 = new AoNAssignment(graph_1);
         aona_1.runAssignment(trips_1,pathlist_1);
 
 //        if(dynamic){
@@ -192,7 +192,7 @@ public class PricingModel {
         return graph_1;
     }
 
-    public AONAssignment getAona_1() {
+    public AoNAssignment getAona_1() {
         return aona_1;
     }
 
