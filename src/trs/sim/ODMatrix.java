@@ -16,6 +16,7 @@ public class ODMatrix {
     Map<String,Double> grav;
     Map<String,Double> trips;
     Map<String,Double> costs;
+    static final double Free_Speed = 500.0;
 
     public ODMatrix(WeightedGraph<String,DefaultWeightedEdge> graph,Map<String,Double> PathInfo){
         this.graph = graph;
@@ -24,7 +25,7 @@ public class ODMatrix {
         trips = new HashMap<String, Double>();
         costs = new HashMap<String, Double>();
         for(Map.Entry<String,Double> pathinfo:this.PathInfo.entrySet()){
-            costs.put(pathinfo.getKey(),pathinfo.getValue()/500.0); //free speed 500 m/min. data source:google maps
+            costs.put(pathinfo.getKey(),pathinfo.getValue()/Free_Speed); //free speed 500 m/min. data source:google maps
         }
     }
 

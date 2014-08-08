@@ -4,12 +4,15 @@ import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.sim.AoNAssignment;
 import trs.sim.Routing;
+import trs.sim.SDEAlgo;
+import trs.sim.netgen.GraphingA;
+
 import java.util.*;
 
 /**
  * Created by kwai on 29/07/14.
  */
-public class PricingModel {
+public class PricingModels {
 
     WeightedGraph<String,DefaultWeightedEdge> graph;
     WeightedGraph<String,DefaultWeightedEdge> graph_1;
@@ -18,19 +21,27 @@ public class PricingModel {
     AoNAssignment aona_1;
     Map<String,List<DefaultWeightedEdge>> pathlist_1;
     Map<String,Double> trips_1;
+    SDEAlgo sde;
 
-    public PricingModel(WeightedGraph<String, DefaultWeightedEdge> graph,Routing routing){
+    public PricingModels(WeightedGraph<String, DefaultWeightedEdge> graph, Routing routing){
         this.graph = graph;
         graph_1 = graph;
         this.routing_1 = routing;
         CgsEdges = new HashSet<DefaultWeightedEdge>();
     }
 
-    public Map<DefaultWeightedEdge,Double> staticChange(
-                                    Map<String, List<DefaultWeightedEdge>> pathlist_0,
-                                    Map<String, Double> trips_0,
-                                    Map<DefaultWeightedEdge, Double> flows_0,
-                                    double cgsBound, boolean dynamic){
+    public PricingModels(WeightedGraph<String, DefaultWeightedEdge> graph, Map<String, List<DefaultWeightedEdge>> pathlist_1){
+        this.graph = graph;
+        graph_1 = graph;
+        this.pathlist_1 = pathlist_1;
+        CgsEdges = new HashSet<DefaultWeightedEdge>();
+    }
+
+    public Map<DefaultWeightedEdge,Double> runGreedyMode(
+            Map<String, List<DefaultWeightedEdge>> pathlist_0,
+            Map<String, Double> trips_0,
+            Map<DefaultWeightedEdge, Double> flows_0,
+            double cgsBound){
         for(DefaultWeightedEdge edge:graph_1.edgeSet()){
             if(flows_0.get(edge)>=cgsBound){
                CgsEdges.add(edge);
@@ -121,21 +132,16 @@ public class PricingModel {
         aona_1 = new AoNAssignment(graph_1);
         aona_1.runAssignment(trips_1,pathlist_1);
 
-//        if(dynamic){
-//            SDEAlgo sde_1 = new SDEAlgo(graph_1,routing_1,aona_1);
-//            sde_1.algoInit();
-//            sde_1.runAlgo();
-//
-//        }
 
         return  aona_1.getLink_flow();
     }
 
-    public Map<DefaultWeightedEdge,Double> selectiveChange(Map<String, List<DefaultWeightedEdge>> pathlist_a,
-                                Map<String, List<DefaultWeightedEdge>> pathlist_b,
-                                Map<String, Double> trips_a,
-                                Map<DefaultWeightedEdge, Double> flows_0,
-                                double cgsBound){
+    public Map<DefaultWeightedEdge,Double> runAdjustingMode(Map<String, List<DefaultWeightedEdge>> pathlist_a,
+                                                            Map<String, List<DefaultWeightedEdge>> pathlist_b,
+                                                            Map<String, Double> trips_a,
+                                                            Map<DefaultWeightedEdge, Double> flows_0,
+                                                            double cgsBound){
+        //reset the removing edges set
         CgsEdges.clear();
         for(DefaultWeightedEdge edge:graph_1.edgeSet()){
             if(flows_0.get(edge)>=cgsBound){
@@ -144,14 +150,14 @@ public class PricingModel {
         }
         System.out.println("\nCongested Edges: "+ CgsEdges);
 
-        return selectiveAssign(trips_a,flows_0,pathlist_a,pathlist_b,cgsBound);
+        return switchAssign(trips_a, flows_0, pathlist_a, pathlist_b, cgsBound);
     }
 
-    public Map<DefaultWeightedEdge,Double> selectiveAssign(Map<String,Double> trips,
-                                                           Map<DefaultWeightedEdge, Double> flows_0,
-                                                           Map<String,List<DefaultWeightedEdge>> pathlist_1,
-                                                           Map<String,List<DefaultWeightedEdge>> pathlist_2,
-                                                           double cgsBound){
+    public Map<DefaultWeightedEdge,Double> switchAssign(Map<String, Double> trips,
+                                                        Map<DefaultWeightedEdge, Double> flows_0,
+                                                        Map<String, List<DefaultWeightedEdge>> pathlist_1,
+                                                        Map<String, List<DefaultWeightedEdge>> pathlist_2,
+                                                        double cgsBound){
         Map<DefaultWeightedEdge,Double> link_flow = new HashMap<DefaultWeightedEdge, Double>();
 
         for(Map.Entry<String,List<DefaultWeightedEdge>> path:pathlist_1.entrySet()){ //each path
@@ -186,6 +192,13 @@ public class PricingModel {
 
         return  link_flow;
 
+    }
+
+    public void runVariableToll(GraphingA graphingA,Map<String,Double> pathinfo_1,AoNAssignment aona){
+        sde = new SDEAlgo(graph, graphingA.getCapacity(), pathlist_1,pathinfo_1, aona);
+        sde.algoInit();
+        sde.runAlgo(true); //true for running the part of pricing;
+        Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
     }
 
     public WeightedGraph<String, DefaultWeightedEdge> getGraph_1() {
