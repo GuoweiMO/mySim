@@ -35,6 +35,8 @@ public class AdvRun {
     public AdvRun(){
         pathlist_1 = new HashMap<String, List<DefaultWeightedEdge>>();
         pathinfo_1 = new HashMap<String, Double>();
+        pathlist_2 = new HashMap<String, List<DefaultWeightedEdge>>();
+        pathinfo_2 = new HashMap<String, Double>();
     }
 
     public void runSimulation(){
@@ -42,7 +44,15 @@ public class AdvRun {
         reConstructPath();
         runODMatrix();
         runAoNAssignment();
+        refineGraph();
         runEquilibrium();
+    }
+
+    public void runSim4Pricing(){
+        runGraphing();
+        reConstructPath();
+        runODMatrix();
+        runAoNAssignment();
     }
 
     public void runGraphing() {
@@ -83,7 +93,8 @@ public class AdvRun {
         JdbcUtils jdbcUtils = new JdbcUtils();
         jdbcUtils.getConnection();
 
-        String sql = "select start_vertex,end_vertex,primary_path_length,primary_path_edges from milan_paths";
+        String sql = "select start_vertex,end_vertex,primary_path_length,primary_path_edges," +
+                        "secondary_path_length,secondary_path_edges from milan_paths";
 
         List<Object> paras = new ArrayList<Object>();
         List<Map<String, Object>> QueryResult = new LinkedList<Map<String, Object>>();
@@ -94,7 +105,8 @@ public class AdvRun {
         }
 
         recoverPath(QueryResult,"primary_path_edges","primary_path_length",1);
-        recoverPath(QueryResult,"secondary_path_edges","secondary_path_length",2);
+        //System.out.println("starting for the second paths:");
+        recoverPath(QueryResult, "secondary_path_edges", "secondary_path_length", 2);
     }
 
     public void recoverPath(List<Map<String, Object>> QueryResult, String attr1,String attr2,int tag){
@@ -102,7 +114,11 @@ public class AdvRun {
              String key = record.get("start_vertex") + "," + record.get("end_vertex");
              List<DefaultWeightedEdge> edgeList = new ArrayList<DefaultWeightedEdge>();
              String pathedges = record.get(attr1).toString().trim();
+             if(pathedges.equals(null) || pathedges.equals("")){
+                 pathedges = record.get("primary_path_edges").toString().trim();
+             }
              pathedges = pathedges.substring(1, pathedges.length() - 1);
+             //System.out.println(pathedges);
              String[] edgeArr = pathedges.split(",");
              for (String edge : edgeArr) {
                  edge = edge.trim();
@@ -121,7 +137,11 @@ public class AdvRun {
              }
              if (tag == 2){
                  pathlist_2.put(key, edgeList);
-                 pathinfo_2.put(key, (Double) record.get(attr2));
+                 if(record.get(attr2) == null || record.get(attr2) == "") {
+                     pathinfo_2.put(key, (Double) record.get("primary_path_length"));
+                 }else {
+                     pathinfo_2.put(key, Double.parseDouble(record.get(attr2).toString()));
+                 }
              }
          }
 
@@ -163,20 +183,15 @@ public class AdvRun {
 //        sb.append("-------------------------All-or-Nothing Assignment----------------------------------\n");
         double pre_total = 0.0d;
         double pre_cost = 0.0d;
-        Set<DefaultWeightedEdge> zeroEdges = new HashSet<DefaultWeightedEdge>();
+
         for (Map.Entry<DefaultWeightedEdge, Double> flow : flows.entrySet()) {
             System.out.println(flow);
-            if (flow.getValue() == 0.0) {
-                zeroEdges.add(flow.getKey());
-            }
 //            sb.append(flow+"\n");
             pre_total += flow.getValue();
             pre_cost += flow.getValue() * graph_0.getEdgeWeight(flow.getKey()) / Free_Speed *
                     (1 + 0.15 * Math.pow(flow.getValue() / graphingA.getCapacity().get(flow.getKey()), 4.0));
         }
         System.out.println("Total Flow: " + pre_total + "  Total Cost: " + pre_cost);
-
-        graph_0.removeAllEdges(zeroEdges); // remove the links that are 0 flows after assignment;
 
 //        sb.append("Total Flow: "+pre_total + "  Total Cost: "+pre_cost);
 //        try {
@@ -190,11 +205,22 @@ public class AdvRun {
 //        }
     }
 
+    public void refineGraph(){
+        Set<DefaultWeightedEdge> zeroEdges = new HashSet<DefaultWeightedEdge>();
+        for (Map.Entry<DefaultWeightedEdge, Double> flow : flows.entrySet()) {
+            if (flow.getValue() == 0.0) {
+                zeroEdges.add(flow.getKey());
+            }
+        }
+        graph_0.removeAllEdges(zeroEdges); // remove the links that are 0 flows after assignment;
+
+    }
+
     public void runEquilibrium(){
         System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
         sde = new SDEAlgo(graph_0, graphingA.getCapacity(), pathlist_1,pathinfo_1, aona);
         sde.algoInit();
-        sde.runAlgo(false); //false for not running the part of pricing;
+        sde.runAlgo(SDEAlgo.PricingType.None); //false for not running the part of pricing;
         SDE_Flows = sde.getNew_Flow();
 
 //        double post_flow = 0.0d;

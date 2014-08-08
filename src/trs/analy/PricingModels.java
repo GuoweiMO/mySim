@@ -140,32 +140,40 @@ public class PricingModels {
                                                             Map<String, List<DefaultWeightedEdge>> pathlist_b,
                                                             Map<String, Double> trips_a,
                                                             Map<DefaultWeightedEdge, Double> flows_0,
-                                                            double cgsBound){
+                                                            Map<DefaultWeightedEdge,Double> capacity){
         //reset the removing edges set
         CgsEdges.clear();
         for(DefaultWeightedEdge edge:graph_1.edgeSet()){
-            if(flows_0.get(edge)>=cgsBound){
+
+            if(flows_0.get(edge)>= capacity.get(edge)){
                 CgsEdges.add(edge);
             }
         }
         System.out.println("\nCongested Edges: "+ CgsEdges);
 
-        return switchAssign(trips_a, flows_0, pathlist_a, pathlist_b, cgsBound);
+        return switchAssign(trips_a, flows_0, pathlist_a, pathlist_b, capacity);
     }
 
     public Map<DefaultWeightedEdge,Double> switchAssign(Map<String, Double> trips,
                                                         Map<DefaultWeightedEdge, Double> flows_0,
                                                         Map<String, List<DefaultWeightedEdge>> pathlist_1,
                                                         Map<String, List<DefaultWeightedEdge>> pathlist_2,
-                                                        double cgsBound){
+                                                        Map<DefaultWeightedEdge,Double> capacity ){
         Map<DefaultWeightedEdge,Double> link_flow = new HashMap<DefaultWeightedEdge, Double>();
+
+        //initialise link_flow
+        for(DefaultWeightedEdge edge_i:graph.edgeSet()){
+            link_flow.put(edge_i,0.0);
+        }
+
 
         for(Map.Entry<String,List<DefaultWeightedEdge>> path:pathlist_1.entrySet()){ //each path
             //System.out.println(path.getKey());
             double percentage = 1;
             for(DefaultWeightedEdge edge:path.getValue()){ //each edge in the path
+
                 if(CgsEdges.contains(edge)) {
-                   percentage  = cgsBound/flows_0.get(edge);
+                   percentage  = capacity.get(edge)/flows_0.get(edge);
                 }
 
                 if (!link_flow.containsKey(edge))
@@ -181,7 +189,8 @@ public class PricingModels {
                         List<DefaultWeightedEdge> alter_path = pathlist_2.get(path_1.getKey()); // get the alternate path
                         for(DefaultWeightedEdge al_edge:alter_path) {
 
-                        link_flow.replace(al_edge,link_flow.get(al_edge)+trips.get(path_1.getKey())*(1-cgsBound/flows_0.get(edge)));
+                        link_flow.replace(al_edge,link_flow.get(al_edge)+trips.get(path_1.getKey())*
+                                                    (1- capacity.get(edge)/flows_0.get(edge)));
 
                         }
 
@@ -194,12 +203,46 @@ public class PricingModels {
 
     }
 
-    public void runVariableToll(GraphingA graphingA,Map<String,Double> pathinfo_1,AoNAssignment aona){
-        sde = new SDEAlgo(graph, graphingA.getCapacity(), pathlist_1,pathinfo_1, aona);
+    public void runVariableToll(Map<String,Double> pathinfo_1,
+                                Map<DefaultWeightedEdge, Double> flows_0,
+                                Map<DefaultWeightedEdge,Double> capacity,
+                                AoNAssignment aona){
+
+        //reset the removing edges set
+        CgsEdges.clear();
+        for(DefaultWeightedEdge edge:graph_1.edgeSet()){
+
+            if(flows_0.get(edge)>= capacity.get(edge)){
+                CgsEdges.add(edge);
+            }
+        }
+
+        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,CgsEdges);
         sde.algoInit();
-        sde.runAlgo(true); //true for running the part of pricing;
+        sde.runAlgo(SDEAlgo.PricingType.VariableRoads); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
     }
+
+    public void runFixedToll(Map<String,Double> pathinfo_1,
+                                Map<DefaultWeightedEdge, Double> flows_0,
+                                Map<DefaultWeightedEdge,Double> capacity,
+                                AoNAssignment aona){
+
+        //reset the removing edges set
+        CgsEdges.clear();
+        for(DefaultWeightedEdge edge:graph_1.edgeSet()){
+
+            if(flows_0.get(edge)>= capacity.get(edge)){
+                CgsEdges.add(edge);
+            }
+        }
+
+        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,CgsEdges);
+        sde.algoInit();
+        sde.runAlgo(SDEAlgo.PricingType.FixedRoads); //true for running the part of pricing;
+        Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
+    }
+
 
     public WeightedGraph<String, DefaultWeightedEdge> getGraph_1() {
         return graph_1;

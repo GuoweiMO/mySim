@@ -70,16 +70,16 @@ public class GraphingA {
                         Double.parseDouble(reader.getMax_lon()));
                 double x = ct.lonToScreenX(mid_lon);
                 if(x <1366.0/8.0 || x > 1366.0*7.0/8.0){
-                    capacity.put(edge,2000.0);
+                    capacity.put(edge,2200.0);
                 }
                 else if(x <1366.0/4.0 || x > 1366.0*3.0/4.0){
-                    capacity.put(edge,1800.0);
+                    capacity.put(edge,2000.0);
                 }
                 else if(x <1366.0*3.0/8.0 || x > 1366.0*5.0/8.0){
-                    capacity.put(edge,1600.0);
+                    capacity.put(edge,1800.0);
                 }
                 else {
-                    capacity.put(edge,1400.0);
+                    capacity.put(edge,1600.0);
                 }
             }
         }

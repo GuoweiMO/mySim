@@ -69,7 +69,7 @@ public class BasicRun {
             System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
             sde = new SDEAlgo(graph_0, graphing_B_0.getEdge_capacity(), pathlist_0,routing_0.getPathinfo_1(), aona_0);
             sde.algoInit();
-            sde.runAlgo(false);
+            sde.runAlgo(SDEAlgo.PricingType.None);
             SDE_Flows = sde.getNew_Flow();
 
 //            int flag = 36;
