@@ -10,6 +10,7 @@ import trs.sim.SDEAlgo;
 import trs.sim.netgen.BasicEdge;
 import trs.sim.netgen.GMLReader;
 import trs.sim.netgen.GraphingA;
+import trs.util.Result2JSON;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,7 +50,7 @@ public class AdvRun {
         reConstructPath();
         runODMatrix();
         runAoNAssignment();
-        refineGraph();
+        //refineGraph();
         runEquilibrium();
     }
 
@@ -231,10 +232,22 @@ public class AdvRun {
 
     public void runEquilibrium(){
         System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
-        sde = new SDEAlgo(graph_0, graphingA.getCapacity(), pathlist_1,pathinfo_1, aona);
+        sde = new SDEAlgo(graph_0, graphingA.getCapacity(), pathlist_1,graphingA.getGraphEdges(),pathinfo_1, aona);
         sde.algoInit();
         sde.runAlgo(SDEAlgo.PricingType.None); //false for not running the part of pricing;
         SDE_Flows = sde.getNew_Flow();
+
+        Result2JSON.writeAsJson("OutPut/4display/sde.json",sde.getIte_flows(),sde.getIte_cost());
+
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/equilibrium/ude")));
+//            writer.write(sde.getSb().toString());
+//            writer.flush();
+//            writer.close();
+//
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
 
 //        double post_flow = 0.0d;
 //        double post_cost = 0.0d;

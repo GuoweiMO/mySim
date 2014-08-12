@@ -2,11 +2,10 @@ package trs.sim;
 
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import trs.sim.netgen.BasicEdge;
+import trs.sim.netgen.Edge_ID;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by kwai on 28/07/14.
@@ -25,6 +24,10 @@ public class SDEAlgo {
     Map<String,Double> pathInfo_1;
     Map<DefaultWeightedEdge,Double> edge_Capacity;
     Set<DefaultWeightedEdge> CgsEdges;
+    Set<BasicEdge> edgeSet;
+    StringBuilder sb;
+    List<Double> ite_flows = new ArrayList<Double>();
+    List<Double> ite_cost = new ArrayList<Double>();
 
     public static enum PricingType{
         FixedRoads, VariableRoads, None
@@ -34,6 +37,7 @@ public class SDEAlgo {
                    Map<DefaultWeightedEdge,Double> edge_Capacity,
                    Map<String,List<DefaultWeightedEdge>> pathList_1,
                    Map<String,Double> pathInfo_1,AoNAssignment aona,
+                   Set<BasicEdge> edgeSet,
                    Set<DefaultWeightedEdge> CgsEdges){
 
         this.graph = graph;
@@ -42,18 +46,21 @@ public class SDEAlgo {
         this.aona = aona;
         this.edge_Capacity = edge_Capacity;
         this.CgsEdges = CgsEdges;
+        this.edgeSet = edgeSet;
 
         Aux_Flow = new HashMap<DefaultWeightedEdge, Double>();
         E_Cost = new HashMap<DefaultWeightedEdge, Double>();
         Old_Flow = new HashMap<DefaultWeightedEdge, Double>();
         New_Flow = new HashMap<DefaultWeightedEdge, Double>();
         Ini_Cost = new HashMap<DefaultWeightedEdge, Double>();
+        sb = new StringBuilder();
     }
 
 
     public SDEAlgo(WeightedGraph<String,DefaultWeightedEdge> graph,
                    Map<DefaultWeightedEdge,Double> edge_Capacity,
                    Map<String,List<DefaultWeightedEdge>> pathList_1,
+                   Set<BasicEdge> edgeSet,
                    Map<String,Double> pathInfo_1,AoNAssignment aona){
 
         this.graph = graph;
@@ -61,12 +68,14 @@ public class SDEAlgo {
         this.pathInfo_1 = pathInfo_1;
         this.aona = aona;
         this.edge_Capacity = edge_Capacity;
+        this.edgeSet = edgeSet;
 
         Aux_Flow = new HashMap<DefaultWeightedEdge, Double>();
         E_Cost = new HashMap<DefaultWeightedEdge, Double>();
         Old_Flow = new HashMap<DefaultWeightedEdge, Double>();
         New_Flow = new HashMap<DefaultWeightedEdge, Double>();
         Ini_Cost = new HashMap<DefaultWeightedEdge, Double>();
+        sb = new StringBuilder();
     }
 
 
@@ -89,6 +98,7 @@ public class SDEAlgo {
             float theta;
             for(int i = 1;;i++){ //start the iteration
                 System.out.println("iteration "+ i);
+                sb.append("iteration " + i + "\n");
                 theta = (float) 1.0/i;
                 double total_flows=0.0d;
                 double total_cost = 0.0d;
@@ -99,6 +109,9 @@ public class SDEAlgo {
                     //System.out.print("current capacity: " + edge_Capacity.get(edge1) + "  ");
 
                     System.out.println( edge1+" ["+Old_Flow.get(edge1)+" --> "+ New_Flow.get(edge1)+"]");
+
+                    Edge_ID ei = new Edge_ID(graph,edgeSet);
+                    sb.append(ei.getEdgeID(edge1)+" "+ New_Flow.get(edge1)+"\n");
 
                     if(type == PricingType.VariableRoads) {
                         if (New_Flow.get(edge1) > edge_Capacity.get(edge1) * 0.8) { //0.8 is better than both 0.7 and 0.9
@@ -125,6 +138,8 @@ public class SDEAlgo {
                 }
 
                 System.out.println("Total flows:" +total_flows +"| Total Cost: " + total_cost);
+                ite_flows.add(total_flows);
+                ite_cost.add(total_cost);
 
                 double RG;
                 double cur_sum =0.0;
@@ -144,12 +159,12 @@ public class SDEAlgo {
 
                 int flag = 0;
                 for(DefaultWeightedEdge edge_n:graph.edgeSet()){
-                    if(Math.abs(New_Flow.get(edge_n) - Old_Flow.get(edge_n)) > 0.1){
+                    if(Math.abs(New_Flow.get(edge_n) - Old_Flow.get(edge_n)) > 1){
                         flag++;
                     }
                 }
                 if(flag == 0){
-                    //System.out.println("User Equilibrium Reaches. (iteration "+i +" )");
+                   // System.out.println("User Equilibrium Reaches. (iteration "+i +" )");
                     //break;
                 }
 
@@ -225,5 +240,17 @@ public class SDEAlgo {
         for(DefaultWeightedEdge edge:graph.edgeSet()){
             E_Cost.replace(edge,graph.getEdgeWeight(edge)/500);
         }
+    }
+
+    public StringBuilder getSb() {
+        return sb;
+    }
+
+    public List<Double> getIte_cost() {
+        return ite_cost;
+    }
+
+    public List<Double> getIte_flows() {
+        return ite_flows;
     }
 }

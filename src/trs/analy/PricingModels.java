@@ -5,7 +5,9 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.sim.AoNAssignment;
 import trs.sim.Routing;
 import trs.sim.SDEAlgo;
+import trs.sim.netgen.BasicEdge;
 import trs.sim.netgen.GraphingA;
+import trs.util.Result2JSON;
 
 import java.util.*;
 
@@ -206,6 +208,7 @@ public class PricingModels {
     public void runVariableToll(Map<String,Double> pathinfo_1,
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
+                                Set<BasicEdge> edgeSet,
                                 AoNAssignment aona){
 
         //reset the removing edges set
@@ -217,15 +220,18 @@ public class PricingModels {
             }
         }
 
-        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,CgsEdges);
+        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,edgeSet,CgsEdges);
         sde.algoInit();
         sde.runAlgo(SDEAlgo.PricingType.VariableRoads); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
+        Result2JSON.writeAsJson("OutPut/4display/variable_toll.json", sde.getIte_flows(), sde.getIte_cost());
+
     }
 
     public void runFixedToll(Map<String,Double> pathinfo_1,
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
+                                Set<BasicEdge> edgeSet,
                                 AoNAssignment aona){
 
         //reset the removing edges set
@@ -237,10 +243,11 @@ public class PricingModels {
             }
         }
 
-        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,CgsEdges);
+        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,edgeSet,CgsEdges);
         sde.algoInit();
         sde.runAlgo(SDEAlgo.PricingType.FixedRoads); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
+        Result2JSON.writeAsJson("OutPut/4display/fixed_toll.json", sde.getIte_flows(), sde.getIte_cost());
     }
 
 

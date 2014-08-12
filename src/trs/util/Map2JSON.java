@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by kwai on 02/08/14.
  */
-public class Data2JSON {
+public class Map2JSON {
 
     public static void writeAsJson(String fileDir){
         GMLReader reader = new GMLReader();
