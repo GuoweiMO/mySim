@@ -3,18 +3,22 @@ package trs.run;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.analy.PricingModels;
 import trs.sim.netgen.BasicEdge;
+import trs.util.Map2JSON;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by kwai on 08/08/14.
  */
 public class AdvPricingRun extends AdvRun{
 
+    Map<String,Double> vtx_flows;
     public AdvPricingRun(){
         super();
     }
@@ -83,20 +87,24 @@ public class AdvPricingRun extends AdvRun{
         runSim4Pricing();
 
         PricingModels vp = new PricingModels(graph_0,pathlist_1);
-        vp.runVariableToll(pathinfo_1,flows,graphingA.getCapacity(),graphingA.getGraphEdges(),aona);
+        vtx_flows = vp.runVariableToll(pathinfo_1,flows,graphingA.getCapacity(),graphingA.getGraphEdges(),aona);
     }
 
     public void fixedRun(){
         runSim4Pricing();
 
         PricingModels vp = new PricingModels(graph_0,pathlist_1);
-        vp.runFixedToll(pathinfo_1,flows,graphingA.getCapacity(),graphingA.getGraphEdges(),aona);
+        vtx_flows = vp.runFixedToll(pathinfo_1,flows,graphingA.getCapacity(),graphingA.getGraphEdges(),aona);
+
     }
 
     public static void main(String[] args){
-        //(new AdvPricingRun()).greedRun();
-        //(new AdvPricingRun()).adjustingRun();
-        //(new AdvPricingRun()).fixedRun();
-        (new AdvPricingRun()).variableRun();
+        AdvPricingRun pr  = new AdvPricingRun();
+        //pr.greedRun();
+        //pr.adjustingRun();
+        //pr.fixedRun();
+        pr.variableRun();
+        //Map2JSON.writeAsJson("OutPut/map_data_5.json", pr.vtx_flows);
+
     }
 }

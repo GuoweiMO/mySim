@@ -9,6 +9,10 @@ import trs.sim.netgen.BasicEdge;
 import trs.sim.netgen.GraphingA;
 import trs.util.Result2JSON;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -205,7 +209,7 @@ public class PricingModels {
 
     }
 
-    public void runVariableToll(Map<String,Double> pathinfo_1,
+    public Map<String,Double> runVariableToll(Map<String,Double> pathinfo_1,
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
                                 Set<BasicEdge> edgeSet,
@@ -224,11 +228,37 @@ public class PricingModels {
         sde.algoInit();
         sde.runAlgo(SDEAlgo.PricingType.VariableRoads); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
-        Result2JSON.writeAsJson("OutPut/4display/variable_toll.json", sde.getIte_flows(), sde.getIte_cost());
+        //Result2JSON.writeAsJson("OutPut/4display/variable_toll.json", sde.getIte_flows(), sde.getIte_cost());
 
+        Map<String,Double> vertex_flows = new HashMap<String, Double>();
+        Map<String,Set<DefaultWeightedEdge>> vertex_edges = new HashMap<String, Set<DefaultWeightedEdge>>();
+
+        for(String vertex:graph.vertexSet()){
+            Set<DefaultWeightedEdge> s_edges = graph.edgesOf(vertex);
+            vertex_edges.put(vertex,s_edges);
+        }
+        for(Map.Entry<String, Set<DefaultWeightedEdge>> entry:vertex_edges.entrySet()){
+            Double v_flows = 0.0;
+            for(DefaultWeightedEdge x_edge:entry.getValue()){
+                v_flows+=SDE_Flows.get(x_edge);
+            }
+            vertex_flows.put(entry.getKey(),v_flows);
+        }
+
+
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/4display/variable_toll_pricing")));
+//            writer.write(sde.getSb().toString());
+//            writer.flush();
+//            writer.close();
+//
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
+        return vertex_flows;
     }
 
-    public void runFixedToll(Map<String,Double> pathinfo_1,
+    public Map<String,Double> runFixedToll(Map<String,Double> pathinfo_1,
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
                                 Set<BasicEdge> edgeSet,
@@ -247,7 +277,34 @@ public class PricingModels {
         sde.algoInit();
         sde.runAlgo(SDEAlgo.PricingType.FixedRoads); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
-        Result2JSON.writeAsJson("OutPut/4display/fixed_toll.json", sde.getIte_flows(), sde.getIte_cost());
+
+        Map<String,Double> vertex_flows = new HashMap<String, Double>();
+        Map<String,Set<DefaultWeightedEdge>> vertex_edges = new HashMap<String, Set<DefaultWeightedEdge>>();
+
+        for(String vertex:graph.vertexSet()){
+            Set<DefaultWeightedEdge> s_edges = graph.edgesOf(vertex);
+            vertex_edges.put(vertex,s_edges);
+        }
+        for(Map.Entry<String, Set<DefaultWeightedEdge>> entry:vertex_edges.entrySet()){
+            Double v_flows = 0.0;
+            for(DefaultWeightedEdge x_edge:entry.getValue()){
+                v_flows+=SDE_Flows.get(x_edge);
+            }
+            vertex_flows.put(entry.getKey(),v_flows);
+        }
+        //Result2JSON.writeAsJson("OutPut/4display/fixed_toll.json", sde.getIte_flows(), sde.getIte_cost());
+
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/4display/fixed_toll_pricing")));
+//            writer.write(sde.getSb().toString());
+//            writer.flush();
+//            writer.close();
+//
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
+
+        return vertex_flows;
     }
 
 

@@ -8,6 +8,8 @@ import trs.sim.netgen.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,7 +17,7 @@ import java.util.Set;
  */
 public class Map2JSON {
 
-    public static void writeAsJson(String fileDir){
+    public static void writeAsJson(String fileDir,Map<String, Double> vertex_flows){
         GMLReader reader = new GMLReader();
         reader.read("Data/cen_milan.gml");
 
@@ -34,7 +36,7 @@ public class Map2JSON {
         for(BasicNode node:graphNodes) {
             JSONObject nodeObj = new JSONObject();
             nodeObj.put("id", node.getID());
-            nodeObj.put("label", node.getID());
+            nodeObj.put("label", String.valueOf(vertex_flows.get(node.getID()).intValue()));
             nodeObj.put("x",ct.lonToScreenX(Double.parseDouble(node.getX())));
             nodeObj.put("y",ct.latToScreenY(Double.parseDouble(node.getY())));
             nodeObj.put("size","1.0");
@@ -45,12 +47,13 @@ public class Map2JSON {
 
         JSONArray edgeArray = new JSONArray();
         Set<BasicEdge> graphEdges = graphingA.getGraphEdges();
-        System.out.println(graphEdges.size());
+        //System.out.println(graphEdges.size());
         for(BasicEdge edge:graphEdges){
             JSONObject edgeObj = new JSONObject();
             edgeObj.put("id",edge.getLid());
             edgeObj.put("source",edge.getSource());
             edgeObj.put("target",edge.getTarget());
+            edgeObj.put("label",edge.getLid());
             edgeArray.add(edgeObj);
         }
 
@@ -67,6 +70,6 @@ public class Map2JSON {
     }
 
     public static void main(String[] args){
-        writeAsJson("OutPut/map_data.json");
+
     }
 }
