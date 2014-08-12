@@ -4,23 +4,26 @@ import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by kwai on 06/08/14.
  */
+
 public class GraphingA {
 
     WeightedGraph<String,DefaultWeightedEdge> u_graph;
     GMLReader reader;
     Map<DefaultWeightedEdge,Double> capacity;
+    Set<BasicNode> graphNodes;
+    Set<BasicEdge> graphEdges;
 
     public GraphingA(GMLReader reader){
         u_graph = new SimpleWeightedGraph<String, DefaultWeightedEdge>(DefaultWeightedEdge.class);
         this.reader = reader;
         capacity = new HashMap<DefaultWeightedEdge, Double>();
+        graphNodes = new HashSet<BasicNode>();
+        graphEdges = new HashSet<BasicEdge>();
     }
 
     public WeightedGraph<String,DefaultWeightedEdge> constructGraph(){
@@ -84,10 +87,30 @@ public class GraphingA {
             }
         }
 
+        int i = 0;
+        for(DefaultWeightedEdge edge:u_graph.edgeSet()){
+            BasicEdge bedge = new BasicEdge(u_graph.getEdgeSource(edge),u_graph.getEdgeTarget(edge),String.valueOf(i++));
+            graphEdges.add(bedge);
+        }
+
+        /**************store the nodes*************/
+        graphNodes = reader.getBasicNodeSet();
+
+        /****************************************/
+
+
         return u_graph;
     }
 
     public Map<DefaultWeightedEdge, Double> getCapacity() {
         return capacity;
+    }
+
+    public Set<BasicNode> getGraphNodes() {
+        return graphNodes;
+    }
+
+    public Set<BasicEdge> getGraphEdges() {
+        return graphEdges;
     }
 }

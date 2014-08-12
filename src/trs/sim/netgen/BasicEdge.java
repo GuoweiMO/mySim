@@ -11,6 +11,8 @@ public class BasicEdge {
     private List<String> endNodeIDs;
     private String lid;
     private String type;
+    private String source;
+    private String target;
 
     public BasicEdge(List coords, List endNodeIDs, String lid){
         this.coords = coords;
@@ -23,6 +25,12 @@ public class BasicEdge {
         this.endNodeIDs = endNodeIDs;
         this.lid = lid;
         this.type = type;
+    }
+
+    public BasicEdge(String source,String target,String lid){
+        this.source = source;
+        this.target = target;
+        this.lid = lid;
     }
 
     public String getLid(){
@@ -51,5 +59,13 @@ public class BasicEdge {
 
     public void setCoords(List<String> coords) {
         this.coords = coords;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getTarget() {
+        return target;
     }
 }

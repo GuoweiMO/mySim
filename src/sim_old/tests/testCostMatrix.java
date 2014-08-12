@@ -27,7 +27,7 @@ public class testCostMatrix {
         CentroidsDesignator cd = new CentroidsDesignator(reader,tree,w_graph,8,8); //62 points
         //cd.designateCentroids();
 
-        //cd.saveCentroids2DB("milan_centroids");
+        cd.saveCentroids2DB("milan_centroids");
 
         List<Map<String,Object>> centroids = CentroidsDesignator.queryCentroidsFromDB("milan_centroids");
         Set centSet = new HashSet();

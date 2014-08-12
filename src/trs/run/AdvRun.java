@@ -7,9 +7,14 @@ import trs.sim.AoNAssignment;
 import trs.sim.ODMatrix;
 import trs.sim.Routing;
 import trs.sim.SDEAlgo;
+import trs.sim.netgen.BasicEdge;
 import trs.sim.netgen.GMLReader;
 import trs.sim.netgen.GraphingA;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -180,13 +185,21 @@ public class AdvRun {
         flows = aona.getLink_flow();
 
 //        StringBuilder sb = new StringBuilder();
-//        sb.append("-------------------------All-or-Nothing Assignment----------------------------------\n");
+        //sb.append("-------------------------All-or-Nothing Assignment----------------------------------\n");
         double pre_total = 0.0d;
         double pre_cost = 0.0d;
 
         for (Map.Entry<DefaultWeightedEdge, Double> flow : flows.entrySet()) {
             System.out.println(flow);
-//            sb.append(flow+"\n");
+//            for(BasicEdge edge:graphingA.getGraphEdges()){
+//                if((graph_0.getEdgeSource(flow.getKey()).equals(edge.getSource()) &&
+//                    graph_0.getEdgeTarget(flow.getKey()).equals(edge.getTarget())) ||
+//                   (graph_0.getEdgeSource(flow.getKey()).equals(edge.getTarget()) &&
+//                    graph_0.getEdgeTarget(flow.getKey()).equals(edge.getSource())) ){
+//                    sb.append(flow.getKey()+" "+ edge.getLid()+ " \n");
+//                }
+//            }
+
             pre_total += flow.getValue();
             pre_cost += flow.getValue() * graph_0.getEdgeWeight(flow.getKey()) / Free_Speed *
                     (1 + 0.15 * Math.pow(flow.getValue() / graphingA.getCapacity().get(flow.getKey()), 4.0));
@@ -195,7 +208,7 @@ public class AdvRun {
 
 //        sb.append("Total Flow: "+pre_total + "  Total Cost: "+pre_cost);
 //        try {
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/AoNA_Flows")));
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/Edge_ID")));
 //            writer.write(sb.toString());
 //            writer.flush();
 //            writer.close();
