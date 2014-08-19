@@ -41,12 +41,6 @@ public class MapPanel extends JPanel {
 
         tripList = BasicAssignment.queryTripsfromDB("milan_BAtrips_2");
 
-
-        JButton button = new JButton("button");
-        this.add(button);
-
-
-
     }
 
     @Override
@@ -92,15 +86,15 @@ public class MapPanel extends JPanel {
 
 
         /*******draw centroid points******/
-//        for(Map cent:centroids) {
-//            Ellipse2D.Double s_cir = new Ellipse2D.Double(tree.getVertexXCoord((String)cent.get("centroid"))*800.0/1366 - 4,
-//                    tree.getVertexYCoord((String) cent.get("centroid"))*600.0/768 - 4, 8, 8);
-//
-//            g.setColor(Color.ORANGE);
-//            ((Graphics2D) g).fill(s_cir);
-//            g.drawString((String) cent.get("centroid"), ((Double) s_cir.getX()).intValue()-6,
-//                    ((Double) s_cir.getY()).intValue());
-//        }
+        for(Map cent:centroids) {
+            Ellipse2D.Double s_cir = new Ellipse2D.Double(tree.getVertexXCoord((String)cent.get("centroid"))*800.0/1366 - 4,
+                    tree.getVertexYCoord((String) cent.get("centroid"))*600.0/768 - 4, 8, 8);
+
+            g.setColor(Color.RED);
+            ((Graphics2D) g).fill(s_cir);
+            g.drawString((String) cent.get("centroid"), ((Double) s_cir.getX()).intValue()-6,
+                    ((Double) s_cir.getY()).intValue());
+        }
 
         /******************Draw all vertexes in the graph*****************/
 //                    for(Object vtx:w_graph.vertexSet()){

@@ -52,9 +52,9 @@ public class AdvRun {
         runGraphing();
         reConstructPath();
         runODMatrix();
-        runAoNAssignment();
+        //runAoNAssignment();
         //refineGraph();
-        runEquilibrium();
+        //runEquilibrium();
     }
 
     public void runSim4Pricing(){
@@ -167,9 +167,13 @@ public class AdvRun {
 
 //        StringBuilder sb = new StringBuilder();
 //        sb.append("-------------------------The O-D Matrix-----------------------------------------------\n");
-//        for(Map.Entry trip: trips.entrySet()) {
-//            sb.append(trip+"\n");
-//        }
+        double tt = 0.0;
+        for(Map.Entry trip: trips.entrySet()) {
+            //sb.append(trip+"\n");
+            if(trip.getKey().toString().startsWith("71,"))
+                tt+=(Double)trip.getValue();
+        }
+        System.out.println(tt);
 //        try {
 //            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/OD_matrix")));
 //            writer.write(sb.toString());
@@ -282,6 +286,6 @@ public class AdvRun {
     public static void main(String[] args){
         AdvRun advRun = new AdvRun();
         advRun.runSimulation();
-        Map2JSON.writeAsJson("OutPut/map_data_3.json",advRun.vertex_flows);
+        //Map2JSON.writeAsJson("OutPut/map_data_3.json",advRun.vertex_flows);
     }
 }
