@@ -1,0 +1,18 @@
+{
+  "cols": [
+        {"id":"","label":"Iteration","type":"number"},
+        {"id":"","label":"Trafficflow","type":"number"},
+        {"id":"","label":"Traffic cost","type":"number"}
+      ],
+  "rows": [
+        {"c":[{"v":1,"f":null},{"v":36,"f":null},{"v":16,"f":null}]},
+        {"c":[{"v":2,"f":null},{"v":123,"f":null},{"v":22,"f":null}]},
+        {"c":[{"v":3,"f":null},{"v":144,"f":null},{"v":35,"f":null}]},
+        {"c":[{"v":4,"f":null},{"v":172,"f":null},{"v":40,"f":null}]},
+        {"c":[{"v":5,"f":null},{"v":166,"f":null},{"v":38,"f":null}]},
+        {"c":[{"v":6,"f":null},{"v":147,"f":null},{"v":34,"f":null}]},
+        {"c":[{"v":7,"f":null},{"v":140,"f":null},{"v":32,"f":null}]},
+        {"c":[{"v":8,"f":null},{"v":133,"f":null},{"v":27,"f":null}]},
+        {"c":[{"v":9,"f":null},{"v":130,"f":null},{"v":25,"f":null}]}
+      ]
+}

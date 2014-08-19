@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/favicon.ico">
+
+    <title>Simulation-Based Pricing</title>
+
+    <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="css/dashboard.css" type="text/css" rel="stylesheet">
+
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script>
+
+    </script>
+
+    <script src="sigmajs/sigma.min.js"></script>
+    <script src="sigmajs/plugins/sigma.parsers.json.min.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
+                <span class="icon-bar"> </span>
+            </button>
+            <a class="navbar-brand" href="index.html">MySim</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html">Settings</a></li>
+                <li><a href="index.html">Profile</a></li>
+                <li><a href="index.html">Help</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li id="li-home"><a id="home" href="index.html">Overview</a></li>
+                <li id="li-sim" ><a id="sim" href="simulation.html">Simulation</a></li>
+                <li class="active"><a href="Analysis.html">Analysis</a></li>
+                <li><a href="">Summary</a></li>
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div class="row placeholder">
+        <img id="one_b" style=" cursor:pointer; width: 30px; height: 30px;" src="images/1.png"/>
+        <img id="two_b" style=" cursor:pointer; width: 30px; height: 30px;" src="images/2.png"/>
+        <img id="three_b" style=" cursor:pointer; width: 30px; height: 30px;" src="images/3.png"/>
+        <img id="four_b" style=" cursor:pointer; width: 30px; height: 30px;" src="images/4.png"/>
+
+        <strong style="padding-left: 200px"> Result of Dynamic Equilibrium</strong>
+
+    </div>
+
+         <div id="display1" style="width: 330px; height: 330px;float: left;"> </div>
+         <div id="display2" style="width: 330px; height: 330px;float: left;"> </div>
+         <div id="display3" style="width: 330px; height: 330px;float: left;"> </div>
+
+
+         <div id="display4" hidden="hidden"
+              style="background-color: lightyellow ;width: 480px; height: 500px;float: left;"> </div>
+         <div id="display5" hidden="hidden"
+              style="background-color: lightyellow ;width: 480px; height: 500px;float: left;"> </div>
+
+        <div id="display6" style="opacity:0; width: 330px; height: 330px;float: left;"> </div>
+        <div id="display7" style="opacity:0; width: 330px; height: 330px;float: left;"> </div>
+        <div id="display8" style="opacity:0; width: 330px; height: 330px;float: left;"> </div>
+        <div id="display12" style="opacity:0; width: 480px; height: 330px;float: left;"> </div>
+        <div id="display13" style="opacity:0; width: 480px; height: 330px;float: left;"> </div>
+
+        <div id="display9" hidden="hidden"
+             style="background-color: lightyellow ;width: 330px; height: 330px;float: left;"> </div>
+        <div id="display10" hidden="hidden"
+             style="background-color: lightyellow ;width: 330px; height: 330px;float: left;"> </div>
+        <div id="display11" hidden="hidden"
+             style="background-color: lightyellow ;width: 330px; height: 330px;float: left;"> </div>
+</div>
+
+        <!--framework js-->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/docs.min.js"></script>
+        <!--customised js-->
+        <!--<script src="js/maphander.js"></script>-->
+        <script src="js/ude1_line.js"></script>
+        <script src="js/ude2_line.js"></script>
+        <script src="js/ude3_line.js"></script>
+        <script src="js/switch.js"></script>
+        <script src="js/aon_net_b.js"></script>
+        <script src="js/static_pricing.js"></script>
+        <script src="js/sde_line.js"></script>
+        <script src="js/fixed_toll.js"></script>
+        <script src="js/variable_toll.js"></script>
+        <script src="js/ude_last_net.js"></script>
+        <script src="js/ftp_last_net.js"></script>
+        <script src="js/vtp_last_net.js"></script>
+        <script src="js/multi_flows.js"></script>
+        <script src="js/multi_costs.js"></script>
+        <!--<script src="js/readFile.js"></script>-->
+</body>
+</html>
