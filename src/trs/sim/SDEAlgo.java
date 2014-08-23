@@ -1,5 +1,6 @@
 package trs.sim;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import trs.sim.netgen.BasicEdge;
@@ -94,7 +95,7 @@ public class SDEAlgo {
     }
 
 
-    public void runAlgo(PricingType type){
+    public void runAlgo(PricingType type, float rate){
             float theta;
             for(int i = 1;;i++){ //start the iteration
                 System.out.println("iteration "+ i);
@@ -102,6 +103,10 @@ public class SDEAlgo {
                 theta = (float) 1.0/i;
                 double total_flows=0.0d;
                 double total_cost = 0.0d;
+
+                int k =0; //k to count the number of charging roads
+                double extra_tolls = 0.0d;
+                Set<DefaultWeightedEdge> CgsSet = new HashSet<DefaultWeightedEdge>();
                 for(DefaultWeightedEdge edge1:graph.edgeSet()){
 
                     New_Flow.replace(edge1,(1.0-theta)*Old_Flow.get(edge1)+theta*Aux_Flow.get(edge1));
@@ -113,11 +118,17 @@ public class SDEAlgo {
                     Edge_ID ei = new Edge_ID(graph,edgeSet);
                     sb.append(ei.getEdgeID(edge1)+" "+ New_Flow.get(edge1)+"\n");
 
+
                     if(type == PricingType.VariableRoads) {
-                        if (New_Flow.get(edge1) > edge_Capacity.get(edge1) * 0.8) { //0.8 is better than both 0.7 and 0.9
+                        if (New_Flow.get(edge1) > edge_Capacity.get(edge1) * rate) { //0.8 is better than both 0.7 and 0.9
                             //variable pricing (20p/km)
+                           // System.out.println(edge1);
+                            CgsSet.add(edge1);
+                            k++;
                             E_Cost.replace(edge1, 0.0002*graph.getEdgeWeight(edge1) +
                                     Ini_Cost.get(edge1) * (1+0.15*Math.pow(New_Flow.get(edge1) / edge_Capacity.get(edge1),4.0)));
+                            extra_tolls += New_Flow.get(edge1)*0.0002*graph.getEdgeWeight(edge1);
+
                         } else
                             E_Cost.replace(edge1, Ini_Cost.get(edge1)*(1+0.15*Math.pow(New_Flow.get(edge1)/edge_Capacity.get(edge1),4.0)));
                     }
@@ -154,6 +165,12 @@ public class SDEAlgo {
                 System.out.println("RelGap: "+ RG);
                 if( i>1 && Math.abs(RG) <0.0001){
                     System.out.println("Social Equilibrium Reaches. (iteration "+i +" )");
+                    if(type == PricingType.VariableRoads) {
+                        CgsEdges.clear();
+                        for (DefaultWeightedEdge eg : CgsSet)
+                            CgsEdges.add(eg);
+                    }
+                    //System.out.println(extra_tolls);
                     break;
                 }
 
@@ -252,5 +269,9 @@ public class SDEAlgo {
 
     public List<Double> getIte_flows() {
         return ite_flows;
+    }
+
+    public Set<DefaultWeightedEdge> getCgsEdges() {
+        return CgsEdges;
     }
 }

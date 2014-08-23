@@ -48,13 +48,14 @@ public class AdvRun {
         pathinfo_2 = new HashMap<String, Double>();
     }
 
-    public void runSimulation(){
+    public Map<DefaultWeightedEdge,Double> runSimulation(){
         runGraphing();
         reConstructPath();
         runODMatrix();
-        //runAoNAssignment();
+        runAoNAssignment();
         //refineGraph();
-        //runEquilibrium();
+        runEquilibrium();
+        return SDE_Flows;
     }
 
     public void runSim4Pricing(){
@@ -71,6 +72,12 @@ public class AdvRun {
 
         graphingA = new GraphingA(reader);
         graph_0 = graphingA.constructGraph();
+
+        double total_dist = 0.0;
+        for(DefaultWeightedEdge edge:graph_0.edgeSet()){
+            total_dist += graph_0.getEdgeWeight(edge);
+        }
+        System.out.println(total_dist);
 //        StringBuffer sb = new StringBuffer();
 //        sb.append("-------------------------The Network-----------------------------------------------\n");
 //        for(DefaultWeightedEdge edge:graph_0.edgeSet()){
@@ -241,7 +248,7 @@ public class AdvRun {
         System.out.println("-------------------------Dynamic Equilibrium Assignment-----------------------------");
         sde = new SDEAlgo(graph_0, graphingA.getCapacity(), pathlist_1,graphingA.getGraphEdges(),pathinfo_1, aona);
         sde.algoInit();
-        sde.runAlgo(SDEAlgo.PricingType.None); //false for not running the part of pricing;
+        sde.runAlgo(SDEAlgo.PricingType.None,0.8f); //false for not running the part of pricing;
         SDE_Flows = sde.getNew_Flow();
 
         vertex_flows = new HashMap<String, Double>();
@@ -285,7 +292,8 @@ public class AdvRun {
 
     public static void main(String[] args){
         AdvRun advRun = new AdvRun();
-        advRun.runSimulation();
+        advRun.runGraphing();
+        //advRun.runSimulation();
         //Map2JSON.writeAsJson("OutPut/map_data_3.json",advRun.vertex_flows);
     }
 }

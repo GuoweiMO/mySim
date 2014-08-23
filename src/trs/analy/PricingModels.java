@@ -2,6 +2,7 @@ package trs.analy;
 
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import trs.run.AdvRun;
 import trs.sim.AoNAssignment;
 import trs.sim.Routing;
 import trs.sim.SDEAlgo;
@@ -172,20 +173,20 @@ public class PricingModels {
             link_flow.put(edge_i,0.0);
         }
 
-
+        //update the involved edges
         for(Map.Entry<String,List<DefaultWeightedEdge>> path:pathlist_1.entrySet()){ //each path
-            //System.out.println(path.getKey());
+
             double percentage = 1;
             for(DefaultWeightedEdge edge:path.getValue()){ //each edge in the path
 
                 if(CgsEdges.contains(edge)) {
-                   percentage  = capacity.get(edge)/flows_0.get(edge);
+                   percentage  = flows_0.get(edge)/capacity.get(edge); //1.xx
                 }
 
                 if (!link_flow.containsKey(edge))
-                        link_flow.put(edge, percentage*trips.get(path.getKey()));
+                        link_flow.put(edge, trips.get(path.getKey())/percentage);
                 else
-                        link_flow.replace(edge, link_flow.get(edge) + percentage*trips.get(path.getKey()));
+                        link_flow.replace(edge, link_flow.get(edge) + trips.get(path.getKey())/percentage);
             }
         }
 
@@ -196,12 +197,10 @@ public class PricingModels {
                         for(DefaultWeightedEdge al_edge:alter_path) {
 
                         link_flow.replace(al_edge,link_flow.get(al_edge)+trips.get(path_1.getKey())*
-                                                    (1- capacity.get(edge)/flows_0.get(edge)));
+                                                    (flows_0.get(edge)/capacity.get(edge) - 1));
 
                         }
-
                     }
-
                 }
             }
 
@@ -213,36 +212,53 @@ public class PricingModels {
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
                                 Set<BasicEdge> edgeSet,
-                                AoNAssignment aona){
+                                AoNAssignment aona,float rate) {
 
         //reset the removing edges set
         CgsEdges.clear();
-        for(DefaultWeightedEdge edge:graph_1.edgeSet()){
+        for (DefaultWeightedEdge edge : graph_1.edgeSet()) {
 
-            if(flows_0.get(edge)>= capacity.get(edge)){
+            if (flows_0.get(edge) >= capacity.get(edge)) {
                 CgsEdges.add(edge);
             }
         }
 
-        sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,edgeSet,CgsEdges);
+        sde = new SDEAlgo(graph, capacity, pathlist_1, pathinfo_1, aona, edgeSet, CgsEdges);
         sde.algoInit();
-        sde.runAlgo(SDEAlgo.PricingType.VariableRoads); //true for running the part of pricing;
-        Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
+        sde.runAlgo(SDEAlgo.PricingType.VariableRoads, rate); //true for running the part of pricing;
+        Map<DefaultWeightedEdge, Double> SDE_Flows = sde.getNew_Flow();
         //Result2JSON.writeAsJson("OutPut/4display/variable_toll.json", sde.getIte_flows(), sde.getIte_cost());
 
-        Map<String,Double> vertex_flows = new HashMap<String, Double>();
-        Map<String,Set<DefaultWeightedEdge>> vertex_edges = new HashMap<String, Set<DefaultWeightedEdge>>();
 
-        for(String vertex:graph.vertexSet()){
-            Set<DefaultWeightedEdge> s_edges = graph.edgesOf(vertex);
-            vertex_edges.put(vertex,s_edges);
-        }
-        for(Map.Entry<String, Set<DefaultWeightedEdge>> entry:vertex_edges.entrySet()){
-            Double v_flows = 0.0;
-            for(DefaultWeightedEdge x_edge:entry.getValue()){
-                v_flows+=SDE_Flows.get(x_edge);
+        AdvRun run = new AdvRun();
+        Map<DefaultWeightedEdge,Double> tmp_Flows = run.runSimulation();
+        System.out.println(sde.getCgsEdges());
+        
+        Double sde_value = 0.0;
+        for(DefaultWeightedEdge edge:sde.getCgsEdges()){
+            for(Map.Entry<DefaultWeightedEdge,Double> tmp:tmp_Flows.entrySet()){
+                if(edge.toString().equals(tmp.getKey().toString())){
+                   sde_value =  tmp.getValue();
+                }
             }
-            vertex_flows.put(entry.getKey(),v_flows);
+            System.out.println(edge+" "+ sde_value.intValue() +" "+ SDE_Flows.get(edge).intValue() +
+                    " " + (sde_value - SDE_Flows.get(edge))/sde_value );
+        }
+
+
+        Map<String, Double> vertex_flows = new HashMap<String, Double>();
+        Map<String, Set<DefaultWeightedEdge>> vertex_edges = new HashMap<String, Set<DefaultWeightedEdge>>();
+
+        for (String vertex : graph.vertexSet()) {
+            Set<DefaultWeightedEdge> s_edges = graph.edgesOf(vertex);
+            vertex_edges.put(vertex, s_edges);
+        }
+        for (Map.Entry<String, Set<DefaultWeightedEdge>> entry : vertex_edges.entrySet()) {
+            Double v_flows = 0.0;
+            for (DefaultWeightedEdge x_edge : entry.getValue()) {
+                v_flows += SDE_Flows.get(x_edge);
+            }
+            vertex_flows.put(entry.getKey(), v_flows);
         }
 
 
@@ -262,21 +278,47 @@ public class PricingModels {
                                 Map<DefaultWeightedEdge, Double> flows_0,
                                 Map<DefaultWeightedEdge,Double> capacity,
                                 Set<BasicEdge> edgeSet,
-                                AoNAssignment aona){
+                                AoNAssignment aona,
+                                float rate){
 
         //reset the removing edges set
         CgsEdges.clear();
         for(DefaultWeightedEdge edge:graph_1.edgeSet()){
 
-            if(flows_0.get(edge)>= capacity.get(edge)){
+            if(flows_0.get(edge)>= rate * capacity.get(edge)){
                 CgsEdges.add(edge);
             }
         }
 
+        //System.out.println("# of Charging Roads:" + CgsEdges.size());
         sde = new SDEAlgo(graph, capacity, pathlist_1,pathinfo_1, aona,edgeSet,CgsEdges);
         sde.algoInit();
-        sde.runAlgo(SDEAlgo.PricingType.FixedRoads); //true for running the part of pricing;
+        sde.runAlgo(SDEAlgo.PricingType.FixedRoads,rate); //true for running the part of pricing;
         Map<DefaultWeightedEdge,Double> SDE_Flows = sde.getNew_Flow();
+
+        double total_tolls = 0.0;
+        for(Map.Entry<DefaultWeightedEdge,Double> flow:SDE_Flows.entrySet()){
+            if(CgsEdges.contains(flow.getKey())){
+                total_tolls += SDE_Flows.get(flow.getKey())*0.0002*graph.getEdgeWeight(flow.getKey());
+            }
+        }
+
+        System.out.println(total_tolls);
+//        AdvRun run = new AdvRun();
+//        Map<DefaultWeightedEdge,Double> tmp_Flows = run.runSimulation();
+//        System.out.println(CgsEdges);
+//        Double sde_value = 0.0;
+//        for(DefaultWeightedEdge edge:CgsEdges){
+//            for(Map.Entry<DefaultWeightedEdge,Double> tmp:tmp_Flows.entrySet()){
+//                if(edge.toString().equals(tmp.getKey().toString())){
+//                   sde_value =  tmp.getValue();
+//                }
+//            }
+//            System.out.println(edge+" "+ sde_value.intValue() +" "+ SDE_Flows.get(edge).intValue() +
+//                    " " + (sde_value - SDE_Flows.get(edge))/sde_value );
+//        }
+
+
 
         Map<String,Double> vertex_flows = new HashMap<String, Double>();
         Map<String,Set<DefaultWeightedEdge>> vertex_edges = new HashMap<String, Set<DefaultWeightedEdge>>();
@@ -292,7 +334,8 @@ public class PricingModels {
             }
             vertex_flows.put(entry.getKey(),v_flows);
         }
-        //Result2JSON.writeAsJson("OutPut/4display/fixed_toll.json", sde.getIte_flows(), sde.getIte_cost());
+
+        //Result2JSON.writeAsJson("OutPut/4display/fixed_toll_0.7.json", sde.getIte_flows(), sde.getIte_cost());
 
 //        try {
 //            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("OutPut/4display/fixed_toll_pricing")));
@@ -303,8 +346,7 @@ public class PricingModels {
 //        }catch (IOException e){
 //            e.printStackTrace();
 //        }
-
-        return vertex_flows;
+            return vertex_flows;
     }
 
 

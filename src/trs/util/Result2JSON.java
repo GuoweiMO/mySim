@@ -121,6 +121,63 @@ public class Result2JSON {
         }
     }
 
+
+    public static void writeAsJson(String fileDir,List<List<Double>> flows_list){
+
+        JSONObject data = new JSONObject();
+        JSONArray colArray = new JSONArray();
+        JSONObject col_obj_1 = new JSONObject();
+        col_obj_1.put("label", "Iteration");
+        col_obj_1.put("type", "number");
+
+        colArray.add(col_obj_1);
+
+        for(int i=0 ;i<flows_list.size(); i++) {
+            JSONObject col_obj = new JSONObject();
+            col_obj.put("label", "v/c =" + (0.7 + i/10.0) );
+            col_obj.put("type", "number");
+
+            colArray.add(col_obj);
+        }
+
+        data.put("cols", colArray);
+
+        JSONArray rowArray = new JSONArray();
+
+        for(int i = 0 ; i < flows_list.get(1).size() ; i++) {
+
+            JSONObject cells = new JSONObject();
+            JSONArray cellList = new JSONArray();
+            JSONObject cell_1 = new JSONObject();
+            cell_1.put("v", i+1);
+            cellList.add(cell_1);
+
+            for (int j = 0; j < flows_list.size(); j++) {
+                if(i > flows_list.get(j).size())
+                    continue;
+
+                 JSONObject cell = new JSONObject();
+                 cell.put("v", flows_list.get(j).get(i));
+                 cellList.add(cell);
+            }
+
+            cells.put("c", cellList);
+            rowArray.add(cells);
+        }
+
+
+        data.put("rows",rowArray);
+
+        try {
+            FileWriter writer = new FileWriter(fileDir);
+            writer.write(data.toJSONString());
+            writer.flush();
+            writer.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args){
 
     }
